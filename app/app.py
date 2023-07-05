@@ -2,8 +2,9 @@ import flet as ft
 import flet_material as fm
 import json
 import os
-import main as backend
 import asyncio
+import aiohttp
+import requests
 
 
 DEFAULT_FLET_PATH = ''
@@ -76,7 +77,7 @@ class MainFormUI(ft.UserControl):
             height=45,
             text="Submit",
             # on_click=lambda e: asyncio.run(self.validation(e))
-            on_click=self.submit_clicked
+            on_click=lambda e: asyncio.run(self.submit_clicked(e))
         )
         super().__init__()
 
@@ -98,13 +99,19 @@ class MainFormUI(ft.UserControl):
     #         await self.education.set_ok()
     #     self.update()
 
-    def submit_clicked(self, e):
-        data = {
+    async def submit_clicked(self, e):
+        url = 'http://127.0.0.1:8000'
+        data_json = {
             'email': self.email.input.value,
             'education': self.education.input.value
         }
         # backend
-        print(json.dumps(data))
+        # print(json.dumps(data_json))
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, json=data_json) as response:
+                data = await response.text()
+                print(data)
+        # res = await requests.post(, data=data)
 
     def build(self):
         return ft.Container(
@@ -177,7 +184,7 @@ def main(page: ft.Page):
     page.update()
 
 
-async def run():
+def run():
     flet_path = os.getenv("FLET_PATH", DEFAULT_FLET_PATH)
     flet_port = int(os.getenv("FLET_PORT", DEFAULT_FLET_PORT))
-    await ft.app(name=flet_path, target=main, view=ft.WEB_BROWSER, port=flet_port)
+    ft.app(name=flet_path, target=main, view=ft.WEB_BROWSER, port=flet_port)

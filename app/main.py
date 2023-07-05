@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import asyncio
@@ -21,8 +21,17 @@ app.add_middleware(
 
 
 @app.on_event("startup")
-async def startup_event():
-    await frontend.run()
+def startup_event():
+    frontend.run()
+
+
+@app.post("/")
+async def get_form_data(info: Request):
+    req_info = await info.json()
+    return {
+        "status": "SUCCESS",
+        "data": req_info
+    }
 
 
 if __name__ == '__main__':
