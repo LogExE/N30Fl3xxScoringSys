@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import asyncio
-import app as frontend
+import datetime
 
 
 app = FastAPI()
@@ -21,8 +21,13 @@ app.add_middleware(
 
 
 @app.on_event("startup")
-def startup_event():
-    frontend.run()
+async def startup_event():
+   print('Server started :', datetime.datetime.now())
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+   print('Server shutdown :', datetime.datetime.now())
 
 
 @app.post("/")
