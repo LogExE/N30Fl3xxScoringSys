@@ -5,77 +5,58 @@ import os
 import asyncio
 import aiohttp
 import requests
+from datetime import datetime
 
+import data
+from front.input_fields import InputFields
+from front.custom_input import CustomContainer, CustomDropdown
 
 DEFAULT_FLET_PATH = ''
 DEFAULT_FLET_PORT = 50422
 
-FORM_WIDTH = 800
+MAIN_WIDTH = 800
 MAIN_COLOR = ft.colors.DEEP_PURPLE_500
 
 
-class InputFields(ft.UserControl):
-    def __init__(self, title: str):
-        self.input: ft.Control = ft.TextField(
-            label=title
-        )
-        self.input_box: ft.Container = ft.Container(
-            expand=True,
-            content=self.input,
-            animate=ft.Animation(300, "ease")
-
-        )
-        self.status: ft.Control = fm.CheckBox(
-            shape="circle",
-            value=False,
-            disabled=True,
-            offset=ft.Offset(1, 0),
-            right=0,
-            bottom=0,
-            top=1,
-            animate_opacity=ft.Animation(200, "linear"),
-            animate_offset=ft.Animation(300, "ease"),
-            opacity=0
-        )
-        self.object = self.create_input(title)
-        super().__init__()
-
-    # async def set_ok(self):
-    #     self.status.offset = ft.Offset(-0.5, 0)
-    #     self.status.opacity = 1
-    #     self.update()
-    #
-    #     await asyncio.sleep(1)
-    #
-    #     self.status.content.value = True
-    #     self.status.animate_checkbox(e=None)
-    #     self.status.update()
-
-
-    def create_input(self, title):
-        return ft.Column(
-            spacing=5,
-            controls=[
-                ft.Stack(
-                    controls=[
-                        self.input_box,
-                        self.status
-                    ]
-                )
-            ]
-        )
-
-    def build(self):
-        return self.object
-
 class MainFormUI(ft.UserControl):
+    """ Главная форма """
+
     def __init__(self):
-        self.email = InputFields("Email")
-        self.education = InputFields("Education")
+        self.surname = InputFields("Фамилия", 1)
+        self.name = InputFields("Имя", 1)
+        self.patronymic = InputFields("Отчество", 1)
+
+        # TODO: добавить преобразование
+        self.gender = ft.RadioGroup(ft.Row([
+            ft.Radio(value="0", label="Мужской"),
+            ft.Radio(value="1", label="Женский")],
+        ))
+
+        self.birth_date = InputFields("", 1, 10, "ДД.ММ.ГГГГ")
+        self.passport_series = InputFields("Серия", 1, 4)
+        self.passport_number = InputFields("Номер", 2, 6)
+
+        self.family = CustomDropdown(data.NAME_FAMILY_STATUS_rus, 2)
+        self.children = InputFields("Количество детей", 1)
+        self.house = CustomDropdown(data.NAME_HOUSING_TYPE_rus, 2)
+        self.car = ft.Checkbox(label="Есть машина", offset=(0, -0.1))
+        self.education = CustomDropdown(data.NAME_EDUCATION_TYPE_rus, 3)
+
+        self.occupation = CustomDropdown(data.OCCUPATION_TYPE_rus, 3)
+        self.organization = CustomDropdown(data.ORGANIZATION_TYPE_rus, 3)
+        self.days_employed = InputFields("", 3, 10, "ДД.ММ.ГГГГ")
+        self.income_type = CustomDropdown(data.NAME_INCOME_TYPE_rus, 1.5)
+        self.income_total = InputFields("Среднегодовой доход", 1.42, suffix_text="\u20BD")
+
+        self.credit = InputFields("Сумма кредита", 1.92, suffix_text="\u20BD")
+        self.months = InputFields("Кредитный период", 1.92, suffix_text="месяцев")
+
+
+
         self.submit = ft.FilledButton(
-            width=FORM_WIDTH,
+            width=MAIN_WIDTH,
             height=45,
-            text="Submit",
+            text="Узнать кредитный рейтинг",
             # on_click=lambda e: asyncio.run(self.validation(e))
             on_click=lambda e: asyncio.run(self.submit_clicked(e))
         )
@@ -100,29 +81,61 @@ class MainFormUI(ft.UserControl):
     #     self.update()
 
     async def submit_clicked(self, e):
+        """ Отправка данных из формы на сервер (в формате JSON) """
         url = 'http://127.0.0.1:8000'
+
+        # TODO: пока все параметры имеют строковый тип данных - исправить после создания модели данных на Pydentic
         data_json = {
-            'email': self.email.input.value,
-            'education': self.education.input.value
+            'SURNAME': self.surname.input.value,
+            'NAME': self.name.input.value,
+            'PATRONYMIC': self.patronymic.input.value,
+            'CODE_GENDER': self.gender.value,
+            # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
+            # 'DAYS_BIRTH': self.birth_date.input.value,
+            'DAYS_BIRTH': str((datetime.now() - datetime.strptime(self.birth_date.input.value, "%d.%m.%Y")).days),
+            'PASSPORT': self.passport_series.input.value + self.passport_number.input.value,
+
+            'NAME_FAMILY_STATUS': self.family.value,
+            'CNT_CHILDREN': self.children.input.value,
+            'NAME_HOUSING_TYPE': self.house.value,
+            'FLAG_OWN_CAR': str(int(self.car.value)),
+            'NAME_EDUCATION_TYPE': self.education.value,
+
+            'OCCUPATION_TYPE': self.occupation.value,
+            'ORGANIZATION_TYPE': self.organization.value,
+            # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
+            # 'DAYS_EMPLOYED': self.days_employed.input.value,
+            'DAYS_EMPLOYED': str((datetime.now() - datetime.strptime(self.days_employed.input.value, "%d.%m.%Y")).days),
+            'NAME_INCOME_TYPE': self.income_type.value,
+            # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
+            # 'AMT_INCOME_TOTAL': self.income_total.input.value,
+            'AMT_INCOME_TOTAL': str(int(self.income_total.input.value) / 2),
+
+            'AMT_CREDIT': self.credit.input.value,
+            # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
+            # 'AMT_ANNUITY': self.months.input.value
+            'AMT_ANNUITY': str(int(self.credit.input.value) / int(self.months.input.value))
+
         }
-        # backend
-        # print(json.dumps(data_json))
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=data_json) as response:
                 data = await response.text()
                 print(data)
-        # res = await requests.post(, data=data)
 
     def build(self):
+        """ Содержимое формы """
         return ft.Container(
-            width=FORM_WIDTH, height=600,
+            width=MAIN_WIDTH,
             bgcolor=ft.colors.with_opacity(0.01, ft.colors.WHITE),
             border_radius=10,
             padding=40,
+            alignment=ft.alignment.center,
             content=ft.Column(
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 alignment=ft.MainAxisAlignment.CENTER,
+                spacing=10,
                 controls=[
+                    # Заголовок
                     ft.Text(
                         "Оценка кредитоспособности",
                         size=25,
@@ -135,8 +148,80 @@ class MainFormUI(ft.UserControl):
                         opacity=0.4
                     ),
                     ft.Divider(height=25, color="transparent"),
-                    self.email,
-                    self.education,
+
+                    # Информация для идентификации клиента
+                    CustomContainer([
+                        ft.Row([
+                            ft.Text("ФИО:  "),
+                            ft.VerticalDivider(width=90),
+                            self.surname,
+                            self.name,
+                            self.patronymic,
+                        ]),
+                        ft.Row([
+                            ft.Text("Дата рождения:  "),
+                            ft.VerticalDivider(width=21),
+                            self.birth_date,
+
+                            ft.VerticalDivider(width=1),
+                            ft.Text("Пол: "),
+                            self.gender,
+                        ]),
+                        ft.Row([
+                            ft.Text("Паспортные данные:  "),
+                            self.passport_series,
+                            self.passport_number
+                        ]),
+                    ]),
+
+                    # Информация о семье
+                    CustomContainer([
+                        ft.Row([
+                            ft.Text("Семейное положение:"),
+                            self.family,
+                            self.children
+                        ]),
+                        ft.Divider(height=10, color="transparent"),
+                        ft.Row([
+                            ft.Text("Тип жилья:"),
+                            ft.VerticalDivider(width=68), self.house,
+                            ft.VerticalDivider(width=15), self.car
+                        ]),
+                        ft.Divider(height=20, color="transparent"),
+                        ft.Row([
+                            ft.Text("Тип образования:"),
+                            ft.VerticalDivider(width=23), self.education,
+                        ]),
+                    ]),
+
+                    # Информация о работе
+                    CustomContainer([
+                        ft.Row([
+                            ft.Text("Тип занятости:"),
+                            ft.VerticalDivider(width=42), self.occupation,
+                        ]),
+                        ft.Divider(height=20, color="transparent"),
+                        ft.Row([
+                            ft.Text("Тип организации:"),
+                            ft.VerticalDivider(width=22), self.organization,
+                        ]),
+                        ft.Divider(height=10, color="transparent"),
+                        ft.Row([
+                            ft.Text("Стаж по текущей\nработе:"),
+                            ft.VerticalDivider(width=22), self.days_employed,
+                        ]),
+                        ft.Row([
+                            ft.Text("Тип дохода:"),
+                            ft.VerticalDivider(width=60), self.income_type, self.income_total
+                        ]),
+                    ]),
+
+                    # Информация о кредите
+                    CustomContainer([
+                        ft.Row([self.credit, self.months])
+                    ]),
+
+                    # Кнопка для отправки данных
                     self.submit
                 ]
             )
@@ -145,14 +230,14 @@ class MainFormUI(ft.UserControl):
 
 def main(page: ft.Page):
     page.theme = ft.Theme(
-        color_scheme=ft.ColorScheme(
-            primary=MAIN_COLOR,
-            primary_container=ft.colors.PINK_200
-        )
+        color_scheme=ft.ColorScheme(primary=MAIN_COLOR)
     )
     page.theme_mode = ft.ThemeMode.LIGHT
+    page.padding = 30
     page.vertical_alignment = ft.MainAxisAlignment.START
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+    page.scroll = ft.ScrollMode.HIDDEN
+
 
     def swap_dark_mode_clicked(e):
         """ Переключение между светлой и темной темой """
@@ -167,8 +252,8 @@ def main(page: ft.Page):
     page.appbar = ft.AppBar(
         leading=ft.Icon(ft.icons.CREDIT_SCORE),
         title=ft.Text("Neo-Scoring System"),
-        bgcolor=ft.colors.SURFACE_VARIANT,
-        color=MAIN_COLOR,
+        bgcolor=ft.colors.SECONDARY_CONTAINER,
+        color=ft.colors.ON_SECONDARY_CONTAINER,
         actions=[
             ft.IconButton(
                 icon=ft.icons.DARK_MODE_OUTLINED,
@@ -188,3 +273,4 @@ if __name__ == '__main__':
     flet_path = os.getenv("FLET_PATH", DEFAULT_FLET_PATH)
     flet_port = int(os.getenv("FLET_PORT", DEFAULT_FLET_PORT))
     ft.app(name=flet_path, target=main, view=ft.WEB_BROWSER, port=flet_port)
+    # ft.app(name=flet_path, target=main, port=flet_port) #  удобнее для отладки

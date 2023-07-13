@@ -4,7 +4,6 @@ import uvicorn
 import asyncio
 import datetime
 
-
 app = FastAPI()
 
 origins = [
@@ -22,17 +21,18 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-   print('Server started :', datetime.datetime.now())
+    print('Server started :', datetime.datetime.now())
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
-   print('Server shutdown :', datetime.datetime.now())
+    print('Server shutdown :', datetime.datetime.now())
 
 
 @app.post("/")
 async def get_form_data(info: Request):
     req_info = await info.json()
+    print(req_info)
     return {
         "status": "SUCCESS",
         "data": req_info
