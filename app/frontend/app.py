@@ -1,15 +1,13 @@
 import flet as ft
-import flet_material as fm
 import json
 import os
 import asyncio
 import aiohttp
-import requests
 from datetime import datetime
 
 import data
-from front.input_fields import InputFields
-from front.custom_input import CustomContainer, CustomDropdown
+from style.input_fields import InputFields
+from style.custom_input import CustomContainer, CustomDropdown
 
 DEFAULT_FLET_PATH = ''
 DEFAULT_FLET_PORT = 50422
@@ -19,6 +17,8 @@ DEFAULT_BACKEND_PORT = '8000'
 
 MAIN_WIDTH = 800
 MAIN_COLOR = ft.colors.DEEP_PURPLE_500
+
+score = ft.Text()  # результат запроса - скоринговый балл
 
 
 class MainFormUI(ft.UserControl):
@@ -125,7 +125,10 @@ class MainFormUI(ft.UserControl):
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=data_json) as response:
                 data = await response.text()
+                score.value = f"Результат запроса: {data}"
+                score.update()
                 print(data)
+
 
     def build(self):
         """ Содержимое формы """
@@ -269,8 +272,9 @@ def main(page: ft.Page):
         ],
     )
 
-    form = MainFormUI()
-    page.add(form)
+    form = MainFormUI()  # форма с полями для ввода и кнопкой
+
+    page.add(form, score)
     page.update()
 
 

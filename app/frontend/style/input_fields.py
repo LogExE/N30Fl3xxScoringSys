@@ -1,5 +1,5 @@
 import flet as ft
-from front.custom_input import ONE_FIELD_WIDTH
+from style.custom_input import ONE_FIELD_WIDTH
 
 
 class InputFields(ft.UserControl):
