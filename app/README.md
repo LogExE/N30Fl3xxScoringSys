@@ -12,6 +12,12 @@ docker-compose -f docker-compose.yml build
 docker-compose -f docker-compose.yml up -d
 ```
 
+## Просмотр логов
+Для того, чтобы посмотреть сообщения из консоли, которое вывел бек/фронт, напишите:
+```sh
+docker logs scoringsys-front # или scoringsys-back соответственно
+```
+
 ## Завершение работы
 Для сворачивания нужно написать вот это:
 ```sh
