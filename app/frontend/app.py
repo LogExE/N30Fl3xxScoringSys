@@ -14,6 +14,9 @@ from front.custom_input import CustomContainer, CustomDropdown
 DEFAULT_FLET_PATH = ''
 DEFAULT_FLET_PORT = 50422
 
+DEFAULT_BACKEND_HOST = '127.0.0.1'
+DEFAULT_BACKEND_PORT = '8000'
+
 MAIN_WIDTH = 800
 MAIN_COLOR = ft.colors.DEEP_PURPLE_500
 
@@ -82,7 +85,9 @@ class MainFormUI(ft.UserControl):
 
     async def submit_clicked(self, e):
         """ Отправка данных из формы на сервер (в формате JSON) """
-        url = 'http://127.0.0.1:8000'
+        host = os.getenv("BACKEND_HOST", DEFAULT_BACKEND_HOST)
+        port = os.getenv("BACKEND_PORT", DEFAULT_BACKEND_PORT)
+        url = f'http://{host}:{port}'
 
         # TODO: пока все параметры имеют строковый тип данных - исправить после создания модели данных на Pydentic
         data_json = {

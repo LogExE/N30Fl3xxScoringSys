@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  frontend:
+    build: ./frontend
+    container_name: scoringsys-front
+    environment:
+      - BACKEND_HOST=backend
+      - FLET_PORT=50422
+    ports:
+      - 80:50422
+    expose:
+      - 50422
+    depends_on:
+      - backend
+  backend:
+    build: ./backend
+    container_name: scoringsys-back
+    environment:
+      - FRONTEND_HOST=frontend
+      - FRONTEND_PORT=50422
+      - UVICORN_HOST=0.0.0.0
+      - UVICORN_PORT=8000
+    expose:
+      - 8000

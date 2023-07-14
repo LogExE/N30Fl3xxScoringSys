@@ -3,11 +3,18 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import asyncio
 import datetime
+import os
+
+DEFAULT_FRONTEND_HOST='127.0.0.1'
+DEFAULT_FRONTEND_PORT='50422'
+
+front_host = os.getenv('FRONTEND_HOST', DEFAULT_FRONTEND_HOST)
+front_port = os.getenv('FRONTEND_PORT', DEFAULT_FRONTEND_PORT)
 
 app = FastAPI()
 
 origins = [
-    "http://127.0.0.1:50422/",
+    f"http://{front_host}:{front_port}/",
 ]
 
 app.add_middleware(
