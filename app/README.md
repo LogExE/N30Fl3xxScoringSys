@@ -18,6 +18,11 @@ docker-compose -f docker-compose.yml up -d
 docker logs scoringsys-front # или scoringsys-back соответственно
 ```
 
+или же, для просмотра одновременно всех логов:
+```sh
+docker-compose logs
+```
+
 ## Завершение работы
 Для сворачивания нужно написать вот это:
 ```sh
