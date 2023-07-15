@@ -3,9 +3,10 @@ import json
 import os
 import asyncio
 import aiohttp
+import time
 from datetime import datetime
 
-import data
+from data import *
 from style.input_fields import InputFields
 from style.custom_input import CustomContainer, CustomDropdown
 
@@ -17,8 +18,6 @@ DEFAULT_BACKEND_PORT = '8000'
 
 MAIN_WIDTH = 800
 MAIN_COLOR = ft.colors.DEEP_PURPLE_500
-
-score = ft.Text()  # результат запроса - скоринговый балл
 
 
 class MainFormUI(ft.UserControl):
@@ -39,22 +38,20 @@ class MainFormUI(ft.UserControl):
         self.passport_series = InputFields("Серия", 1, 4)
         self.passport_number = InputFields("Номер", 2, 6)
 
-        self.family = CustomDropdown(data.NAME_FAMILY_STATUS_rus, 2)
+        self.family = CustomDropdown(NAME_FAMILY_STATUS_rus, 2)
         self.children = InputFields("Количество детей", 1)
-        self.house = CustomDropdown(data.NAME_HOUSING_TYPE_rus, 2)
+        self.house = CustomDropdown(NAME_HOUSING_TYPE_rus, 2)
         self.car = ft.Checkbox(label="Есть машина", offset=(0, -0.1))
-        self.education = CustomDropdown(data.NAME_EDUCATION_TYPE_rus, 3)
+        self.education = CustomDropdown(NAME_EDUCATION_TYPE_rus, 3)
 
-        self.occupation = CustomDropdown(data.OCCUPATION_TYPE_rus, 3)
-        self.organization = CustomDropdown(data.ORGANIZATION_TYPE_rus, 3)
+        self.occupation = CustomDropdown(OCCUPATION_TYPE_rus, 3)
+        self.organization = CustomDropdown(ORGANIZATION_TYPE_rus, 3)
         self.days_employed = InputFields("", 3, 10, "ДД.ММ.ГГГГ")
-        self.income_type = CustomDropdown(data.NAME_INCOME_TYPE_rus, 1.5)
+        self.income_type = CustomDropdown(NAME_INCOME_TYPE_rus, 1.5)
         self.income_total = InputFields("Среднегодовой доход", 1.42, suffix_text="\u20BD")
 
         self.credit = InputFields("Сумма кредита", 1.92, suffix_text="\u20BD")
         self.months = InputFields("Кредитный период", 1.92, suffix_text="месяцев")
-
-
 
         self.submit = ft.FilledButton(
             width=MAIN_WIDTH,
@@ -62,6 +59,12 @@ class MainFormUI(ft.UserControl):
             text="Узнать кредитный рейтинг",
             # on_click=lambda e: asyncio.run(self.validation(e))
             on_click=lambda e: asyncio.run(self.submit_clicked(e))
+        )
+        self.progress = ft.ProgressRing(visible=False)
+        self.score = ft.Text(
+            size=21,
+            weight=ft.FontWeight.W_700,
+            color=MAIN_COLOR
         )
         super().__init__()
 
@@ -83,7 +86,15 @@ class MainFormUI(ft.UserControl):
     #         await self.education.set_ok()
     #     self.update()
 
+    def mapping(self, val, dct):
+        return None if val is None else dct[val]
+
     async def submit_clicked(self, e):
+        self.submit.visible = False
+        self.progress.visible = True
+        self.score.value = None
+        self.update()
+
         """ Отправка данных из формы на сервер (в формате JSON) """
         host = os.getenv("BACKEND_HOST", DEFAULT_BACKEND_HOST)
         port = os.getenv("BACKEND_PORT", DEFAULT_BACKEND_PORT)
@@ -100,35 +111,43 @@ class MainFormUI(ft.UserControl):
             'DAYS_BIRTH': str((datetime.now() - datetime.strptime(self.birth_date.input.value, "%d.%m.%Y")).days),
             'PASSPORT': self.passport_series.input.value + self.passport_number.input.value,
 
-            'NAME_FAMILY_STATUS': self.family.value,
+            'NAME_FAMILY_STATUS': self.mapping(self.family.value, NAME_FAMILY_STATUS_dict),
             'CNT_CHILDREN': self.children.input.value,
-            'NAME_HOUSING_TYPE': self.house.value,
+            'NAME_HOUSING_TYPE': self.mapping(self.house.value, NAME_HOUSING_TYPE_dict),
             'FLAG_OWN_CAR': str(int(self.car.value)),
-            'NAME_EDUCATION_TYPE': self.education.value,
+            'NAME_EDUCATION_TYPE': self.mapping(self.education.value, NAME_EDUCATION_TYPE_dict),
 
-            'OCCUPATION_TYPE': self.occupation.value,
-            'ORGANIZATION_TYPE': self.organization.value,
+            'OCCUPATION_TYPE': self.mapping(self.occupation.value, OCCUPATION_TYPE_dict),
+            'ORGANIZATION_TYPE': self.mapping(self.organization.value, ORGANIZATION_TYPE_dict),
             # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
             # 'DAYS_EMPLOYED': self.days_employed.input.value,
             'DAYS_EMPLOYED': str((datetime.now() - datetime.strptime(self.days_employed.input.value, "%d.%m.%Y")).days),
-            'NAME_INCOME_TYPE': self.income_type.value,
+            'NAME_INCOME_TYPE': self.mapping(self.income_type.value, NAME_INCOME_TYPE_dict),
             # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
             # 'AMT_INCOME_TOTAL': self.income_total.input.value,
-            'AMT_INCOME_TOTAL': str(int(self.income_total.input.value) / 2),
+            'AMT_INCOME_TOTAL': str(float(self.income_total.input.value) / 2),
 
             'AMT_CREDIT': self.credit.input.value,
             # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
             # 'AMT_ANNUITY': self.months.input.value
-            'AMT_ANNUITY': str(int(self.credit.input.value) / int(self.months.input.value))
-
+            'AMT_ANNUITY': str(float(self.credit.input.value) / int(self.months.input.value))
         }
+
+
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=data_json) as response:
                 data = await response.text()
-                score.value = f"Результат запроса: {data}"
-                score.update()
-                print(data)
 
+                time.sleep(3)  # для демонстрации!!
+
+                score = 100  # позже заменим на data
+
+                self.submit.visible = True
+                self.progress.visible = False
+                self.score.value = f"Ваш крединый рейтинг: {score}"
+
+                self.update()
+                print(data)
 
     def build(self):
         """ Содержимое формы """
@@ -230,7 +249,13 @@ class MainFormUI(ft.UserControl):
                     ]),
 
                     # Кнопка для отправки данных
-                    self.submit
+                    self.submit,
+
+                    # Ожидание ответа на запрос
+                    self.progress,
+
+                    # Результат запроса
+                    self.score
                 ]
             )
         )
@@ -245,7 +270,6 @@ def main(page: ft.Page):
     page.vertical_alignment = ft.MainAxisAlignment.START
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.scroll = ft.ScrollMode.HIDDEN
-
 
     def swap_dark_mode_clicked(e):
         """ Переключение между светлой и темной темой """
@@ -272,9 +296,8 @@ def main(page: ft.Page):
         ],
     )
 
-    form = MainFormUI()  # форма с полями для ввода и кнопкой
-
-    page.add(form, score)
+    form = MainFormUI()
+    page.add(form)
     page.update()
 
 
