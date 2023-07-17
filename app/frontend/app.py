@@ -8,6 +8,7 @@ from datetime import datetime
 
 from data import *
 from style.input_fields import InputFields
+# from style.input_dropdown import InputDropdown
 from style.custom_input import CustomContainer, CustomDropdown
 
 DEFAULT_FLET_PATH = ''
@@ -27,11 +28,9 @@ class MainFormUI(ft.UserControl):
         self.surname = InputFields("Фамилия", 1)
         self.name = InputFields("Имя", 1)
         self.patronymic = InputFields("Отчество", 1)
-
-        # TODO: добавить преобразование
         self.gender = ft.RadioGroup(ft.Row([
-            ft.Radio(value="0", label="Мужской"),
-            ft.Radio(value="1", label="Женский")],
+            ft.Radio(value="M", label="Мужской"),
+            ft.Radio(value="F", label="Женский")],
         ))
 
         self.birth_date = InputFields("", 1, 10, "ДД.ММ.ГГГГ")
@@ -46,7 +45,7 @@ class MainFormUI(ft.UserControl):
 
         self.occupation = CustomDropdown(OCCUPATION_TYPE_rus, 3)
         self.organization = CustomDropdown(ORGANIZATION_TYPE_rus, 3)
-        self.days_employed = InputFields("", 3, 10, "ДД.ММ.ГГГГ")
+        self.days_employed = InputFields("", 3, 3, suffix_text="лет")
         self.income_type = CustomDropdown(NAME_INCOME_TYPE_rus, 1.5)
         self.income_total = InputFields("Среднегодовой доход", 1.42, suffix_text="\u20BD")
 
@@ -67,24 +66,6 @@ class MainFormUI(ft.UserControl):
             color=MAIN_COLOR
         )
         super().__init__()
-
-    # async def validation(self, e):
-    #     email_val = self.email.input.value
-    #     education_val = self.education.input.value
-    #     # data = {
-    #     #     'email': self.email.input.value,
-    #     #     'education': self.education.input.value
-    #     # }
-    #     # await return json.dumps(data)
-    #     # print(json.dumps(data))
-    #
-    #     if len(email_val) > 3:
-    #         await asyncio.sleep(0.5)
-    #         await self.email.set_ok()
-    #     if len(education_val) > 3:
-    #         await asyncio.sleep(0.5)
-    #         await self.education.set_ok()
-    #     self.update()
 
     def mapping(self, val, dct):
         return None if val is None else dct[val]
@@ -121,7 +102,7 @@ class MainFormUI(ft.UserControl):
             'ORGANIZATION_TYPE': self.mapping(self.organization.value, ORGANIZATION_TYPE_dict),
             # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
             # 'DAYS_EMPLOYED': self.days_employed.input.value,
-            'DAYS_EMPLOYED': str((datetime.now() - datetime.strptime(self.days_employed.input.value, "%d.%m.%Y")).days),
+            'DAYS_EMPLOYED': self.days_employed.input.value,
             'NAME_INCOME_TYPE': self.mapping(self.income_type.value, NAME_INCOME_TYPE_dict),
             # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
             # 'AMT_INCOME_TOTAL': self.income_total.input.value,
@@ -133,12 +114,12 @@ class MainFormUI(ft.UserControl):
             'AMT_ANNUITY': str(float(self.credit.input.value) / int(self.months.input.value))
         }
 
-
+        print("Req_body: ", data_json)
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=data_json) as response:
                 data = await response.text()
 
-                time.sleep(3)  # для демонстрации!!
+                time.sleep(1.5)  # для демонстрации!!
 
                 score = 100  # позже заменим на data
 
@@ -147,7 +128,7 @@ class MainFormUI(ft.UserControl):
                 self.score.value = f"Ваш крединый рейтинг: {score}"
 
                 self.update()
-                print(data)
+                print("Resp_body: ", data)
 
     def build(self):
         """ Содержимое формы """
