@@ -1,42 +1,35 @@
 import flet as ft
-from style.custom_input import ONE_FIELD_WIDTH
+from style.custom_containers import ONE_FIELD_WIDTH
 
 
-class InputDropdown(ft.UserControl):
+class InputDropdown(ft.Dropdown):
     def __init__(self, options, width):
-        self.input: ft.Control = ft.Dropdown(
-            height=40,
-            width=width * ONE_FIELD_WIDTH,
-            text_size=14,
-            text_style=ft.TextStyle.weight,
-            content_padding=5,
-            offset=(0, -0.3),
-            options=[ft.dropdown.Option(option) for option in options],
-
-            # bgcolor=ft.colors.RED_100
-        )
         super().__init__()
+        self.height = 40
+        self.width = width * ONE_FIELD_WIDTH
+        self.text_size = 14
+        self.text_style = ft.TextStyle.weight
+        self.content_padding = 5
+        self.offset = (0, -0.3)
 
-    #     self.status: ft.Control = ft.Container(
-    #         offset=(0, -0.3),
-    #         bgcolor=ft.colors.RED_100,
-    #         visible=False
-    #     )
-    #
-    # def set_error(self, e):
-    #     if e:
-    #         self.status.visible = True
-    #     else:
-    #         self.status.visible = False
+        self.options = [ft.dropdown.Option(option) for option in options]
 
+        self.border_color = ft.colors.BLACK
+        self.border_width = 1
+        self.focused_border_color = ft.colors.DEEP_PURPLE_500
+        self.focused_border_width = 2
+        self.hint_text = " "
 
-    # def build(self):
-    #     return ft.Stack(
-    #         controls=[
-    #             self.status,
-    #             self.input
-    #         ]
-    #     )
+    def set_error(self, e):
+        if e:
+            self.border_color = ft.colors.RED_500
+            self.focused_border_color = ft.colors.RED_500
+            self.border_width = 2
+            self.hint_text = "Выберите значение"
+        else:
+            self.border_color = ft.colors.BLACK
+            self.focused_border_color = ft.colors.DEEP_PURPLE_500
+            self.border_width = 1
+            self.hint_text = " "
 
-    def build(self):
-        return self.input
+        self.update()

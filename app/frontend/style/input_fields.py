@@ -1,25 +1,36 @@
 import flet as ft
-from style.custom_input import ONE_FIELD_WIDTH
+from style.custom_containers import ONE_FIELD_WIDTH
 
 
-class InputFields(ft.UserControl):
+class InputFields(ft.TextField):
     def __init__(self, title, width, max_length=None, hint_text=None, suffix_text=None):
-        self.input: ft.Control = ft.TextField(
-            label=title,
-            height=60,
-            width=width*ONE_FIELD_WIDTH,
-            capitalization="WORDS",
-
-            max_length=max_length,
-            counter_text=" ",
-            expand=True,
-
-            hint_text=hint_text,
-            hint_style=ft.TextStyle(size=14, weight=ft.FontWeight.NORMAL),
-
-            suffix_text=suffix_text
-        )
         super().__init__()
+        self.label = title
+        self.height = 60
+        self.width = width * ONE_FIELD_WIDTH
+        self.capitalization = "WORDS"
 
-    def build(self):
-        return self.input
+        self.max_length = max_length
+        self.counter_text = " "
+
+        self.hint_text = hint_text
+        self.hint_style = ft.TextStyle(size=14, weight=ft.FontWeight.NORMAL)
+
+        self.suffix_text = suffix_text
+
+        self.border_color = ft.colors.BLACK
+        self.border_width = 1
+        self.focused_border_color = ft.colors.DEEP_PURPLE_500
+        self.focused_border_width = 2
+
+    def set_error(self, e):
+        if e:
+            self.border_color = ft.colors.RED_500
+            self.focused_border_color = ft.colors.RED_500
+            self.border_width = 2
+        else:
+            self.border_color = ft.colors.BLACK
+            self.focused_border_color = ft.colors.DEEP_PURPLE_500
+            self.border_width = 1
+
+        self.update()

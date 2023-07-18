@@ -20,14 +20,14 @@ def CustomContainer(controls):
         content=CustomColumn(controls)
     )
 
-
-def CustomDropdown(options, width):
-    return ft.Dropdown(
-        height=40,
-        width=width*ONE_FIELD_WIDTH,
-        text_size=14,
-        text_style=ft.TextStyle.weight,
-        content_padding=5,
-        offset=(0, -0.3),
-        options=[ft.dropdown.Option(option) for option in options],
-    )
+#
+# def CustomDropdown(options, width):
+#     return ft.Dropdown(
+#         height=40,
+#         width=width*ONE_FIELD_WIDTH,
+#         text_size=14,
+#         text_style=ft.TextStyle.weight,
+#         content_padding=5,
+#         offset=(0, -0.3),
+#         options=[ft.dropdown.Option(option) for option in options],
+#     )
