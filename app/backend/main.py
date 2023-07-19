@@ -10,14 +10,20 @@ import aiohttp
 
 DEFAULT_FRONTEND_HOST = '127.0.0.1'
 DEFAULT_FRONTEND_PORT = '50422'
+DEFAULT_DATA_HOST = '127.0.0.1'
+DEFAULT_DATA_PORT = '50422'
 
 front_host = os.getenv('FRONTEND_HOST', DEFAULT_FRONTEND_HOST)
 front_port = os.getenv('FRONTEND_PORT', DEFAULT_FRONTEND_PORT)
+front_addr = f"http://{front_host}:{front_port}/"
+data_host = os.getenv('DATA_HOST', DEFAULT_DATA_HOST)
+data_port = os.getenv('DATA_PORT', DEFAULT_DATA_PORT)
+data_addr = f"http://{data_host}:{data_port}/"
 
 app = FastAPI()
 
 origins = [
-    f"http://{front_host}:{front_port}/",
+    front_addr,
 ]
 
 app.add_middleware(
@@ -171,8 +177,9 @@ async def post_on_ml(info: Validation):
 
     # Шаг 2: Асинхронная отправка POST-запроса к другому приложению ML
     async with aiohttp.ClientSession() as session:
-        async with session.post('http://127.0.0.1:8888/') as response:
-            result = await response.json()
+        async with session.post(data_addr) as response:
+            result = await response.text()
+            print('POST to DATA:', result)
 
 
 async def send_to_ml(info: Validation):
@@ -181,4 +188,4 @@ async def send_to_ml(info: Validation):
     pass
 
 if __name__ == '__main__':
-    uvicorn.run("main:app", reload=True)
+    uvicorn.run(app, reload=True)
