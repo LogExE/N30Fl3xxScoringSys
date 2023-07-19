@@ -1,6 +1,14 @@
 version: "3"
 
 services:
+  nginx:
+      image: nginx
+      volumes:
+        - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      ports:
+        - 80:80
+      depends_on:
+        - frontend
   frontend:
     build: ./frontend
     container_name: scoringsys-front
@@ -8,8 +16,6 @@ services:
       - BACKEND_HOST=backend
       - FLET_PORT=50422
       - PYTHONUNBUFFERED=1
-    ports:
-      - 80:50422
     expose:
       - 50422
     depends_on:
@@ -24,6 +30,7 @@ services:
       - DATA_PORT=8888
       - UVICORN_HOST=0.0.0.0
       - UVICORN_PORT=8000
+      - UVICORN_ROOT_PATH=/api
     expose:
       - 8000
   ml:
