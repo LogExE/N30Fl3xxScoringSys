@@ -1,0 +1,74 @@
+name: Pylint
+
+on: [push]
+
+jobs:
+  test_front:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Install pylint
+      run: |
+        python -m pip install --upgrade pip
+        pip install pylint
+    - name: Install requirements
+      run: |
+        pip install -r ./app/frontend/requirements.txt
+    - name: Analysing the code with pylint
+      run: |
+        files=$(git ls-files './app/frontend/*.py')
+        if [[ $files ]]; then
+          pylint $files
+        else
+          echo 'No python files! Hmm....'
+        fi
+  test_back:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Install pylint
+      run: |
+        python -m pip install --upgrade pip
+        pip install pylint
+    - name: Install requirements
+      run: |
+        pip install -r ./app/backend/requirements.txt
+    - name: Analysing the code with pylint
+      run: |
+        files=$(git ls-files './app/backend/*.py')
+        if [[ $files ]]; then
+          pylint $files
+        else
+          echo 'No python files! Hmm....'
+        fi
+  test_ml:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Install pylint
+      run: |
+        python -m pip install --upgrade pip
+        pip install pylint
+    - name: Install requirements
+      run: |
+        pip install -r ./app/ML/requirements.txt
+    - name: Analysing the code with pylint
+      run: |
+        files=$(git ls-files './app/ML/*.py')
+        if [[ $files ]]; then
+          pylint $files
+        else
+          echo 'No python files! Hmm....'
+        fi
