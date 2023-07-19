@@ -8,8 +8,9 @@ from datetime import datetime
 
 from data import *
 from style.input_fields import InputFields
-# from style.input_dropdown import InputDropdown
-from style.custom_input import CustomContainer, CustomDropdown
+from style.input_radio import InputRadio
+from style.input_dropdown import InputDropdown
+from style.custom_containers import CustomContainer
 
 DEFAULT_FLET_PATH = ''
 DEFAULT_FLET_PORT = 50422
@@ -28,25 +29,22 @@ class MainFormUI(ft.UserControl):
         self.surname = InputFields("Фамилия", 1)
         self.name = InputFields("Имя", 1)
         self.patronymic = InputFields("Отчество", 1)
-        self.gender = ft.RadioGroup(ft.Row([
-            ft.Radio(value="M", label="Мужской"),
-            ft.Radio(value="F", label="Женский")],
-        ))
+        self.gender = InputRadio({"M": "Мужской", "F": "Женский"})
 
         self.birth_date = InputFields("", 1, 10, "ДД.ММ.ГГГГ")
         self.passport_series = InputFields("Серия", 1, 4)
         self.passport_number = InputFields("Номер", 2, 6)
 
-        self.family = CustomDropdown(NAME_FAMILY_STATUS_rus, 2)
+        self.family = InputDropdown(NAME_FAMILY_STATUS_rus, 2)
         self.children = InputFields("Количество детей", 1)
-        self.house = CustomDropdown(NAME_HOUSING_TYPE_rus, 2)
+        self.house = InputDropdown(NAME_HOUSING_TYPE_rus, 2)
         self.car = ft.Checkbox(label="Есть машина", offset=(0, -0.1))
-        self.education = CustomDropdown(NAME_EDUCATION_TYPE_rus, 3)
+        self.education = InputDropdown(NAME_EDUCATION_TYPE_rus, 3)
 
-        self.occupation = CustomDropdown(OCCUPATION_TYPE_rus, 3)
-        self.organization = CustomDropdown(ORGANIZATION_TYPE_rus, 3)
+        self.occupation = InputDropdown(OCCUPATION_TYPE_rus, 3)
+        self.organization = InputDropdown(ORGANIZATION_TYPE_rus, 3)
         self.days_employed = InputFields("", 3, 3, suffix_text="лет")
-        self.income_type = CustomDropdown(NAME_INCOME_TYPE_rus, 1.5)
+        self.income_type = InputDropdown(NAME_INCOME_TYPE_rus, 1.5)
         self.income_total = InputFields("Среднегодовой доход", 1.42, suffix_text="\u20BD")
 
         self.credit = InputFields("Сумма кредита", 1.92, suffix_text="\u20BD")
@@ -56,7 +54,6 @@ class MainFormUI(ft.UserControl):
             width=MAIN_WIDTH,
             height=45,
             text="Узнать кредитный рейтинг",
-            # on_click=lambda e: asyncio.run(self.validation(e))
             on_click=lambda e: asyncio.run(self.submit_clicked(e))
         )
         self.progress = ft.ProgressRing(visible=False)
@@ -83,17 +80,17 @@ class MainFormUI(ft.UserControl):
 
         # TODO: пока все параметры имеют строковый тип данных - исправить после создания модели данных на Pydentic
         data_json = {
-            'SURNAME': self.surname.input.value,
-            'NAME': self.name.input.value,
-            'PATRONYMIC': self.patronymic.input.value,
-            'CODE_GENDER': self.gender.value,
+            'SURNAME': self.surname.value,
+            'NAME': self.name.value,
+            'PATRONYMIC': self.patronymic.value,
+            'CODE_GENDER': self.gender.content.value,
             # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
             # 'DAYS_BIRTH': self.birth_date.input.value,
-            'DAYS_BIRTH': str((datetime.now() - datetime.strptime(self.birth_date.input.value, "%d.%m.%Y")).days),
-            'PASSPORT': self.passport_series.input.value + self.passport_number.input.value,
+            'DAYS_BIRTH': str((datetime.now() - datetime.strptime(self.birth_date.value, "%d.%m.%Y")).days),
+            'PASSPORT': self.passport_series.value + self.passport_number.value,
 
             'NAME_FAMILY_STATUS': self.mapping(self.family.value, NAME_FAMILY_STATUS_dict),
-            'CNT_CHILDREN': self.children.input.value,
+            'CNT_CHILDREN': self.children.value,
             'NAME_HOUSING_TYPE': self.mapping(self.house.value, NAME_HOUSING_TYPE_dict),
             'FLAG_OWN_CAR': str(int(self.car.value)),
             'NAME_EDUCATION_TYPE': self.mapping(self.education.value, NAME_EDUCATION_TYPE_dict),
@@ -102,16 +99,16 @@ class MainFormUI(ft.UserControl):
             'ORGANIZATION_TYPE': self.mapping(self.organization.value, ORGANIZATION_TYPE_dict),
             # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
             # 'DAYS_EMPLOYED': self.days_employed.input.value,
-            'DAYS_EMPLOYED': self.days_employed.input.value,
+            'DAYS_EMPLOYED': self.days_employed.value,
             'NAME_INCOME_TYPE': self.mapping(self.income_type.value, NAME_INCOME_TYPE_dict),
             # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
             # 'AMT_INCOME_TOTAL': self.income_total.input.value,
-            'AMT_INCOME_TOTAL': str(float(self.income_total.input.value) / 2),
+            'AMT_INCOME_TOTAL': str(float(self.income_total.value) / 2),
 
-            'AMT_CREDIT': self.credit.input.value,
+            'AMT_CREDIT': self.credit.value,
             # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
             # 'AMT_ANNUITY': self.months.input.value
-            'AMT_ANNUITY': str(float(self.credit.input.value) / int(self.months.input.value))
+            'AMT_ANNUITY': str(float(self.credit.value) / int(self.months.value))
         }
 
         print("Req_body: ", data_json)
@@ -127,8 +124,13 @@ class MainFormUI(ft.UserControl):
                 self.progress.visible = False
                 self.score.value = f"Ваш крединый рейтинг: {score}"
 
+                # демонстрация отображения ошибок
+                # self.family.set_error(True)
+                # self.name.set_error(True)
+                # self.gender.set_error(True)
+
                 self.update()
-                print("Resp_body: ", data)
+                print("\nResp_body: ", data)
 
     def build(self):
         """ Содержимое формы """
@@ -286,4 +288,3 @@ if __name__ == '__main__':
     flet_path = os.getenv("FLET_PATH", DEFAULT_FLET_PATH)
     flet_port = int(os.getenv("FLET_PORT", DEFAULT_FLET_PORT))
     ft.app(name=flet_path, target=main, view=ft.WEB_BROWSER, port=flet_port)
-    # ft.app(name=flet_path, target=main, port=flet_port) #  удобнее для отладки
