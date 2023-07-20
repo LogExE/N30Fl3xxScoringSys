@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Body
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import asyncio
@@ -44,15 +44,8 @@ async def startup_event():
 async def shutdown_event():
     print('Server shutdown :', datetime.datetime.now())
 
-## настин запрос
-@app.post("/123")
-async def get_form_data(info: Request):
-    req_info = await info.json()
-    print(req_info)
-    return {
-        "status": "SUCCESS",
-        "data": req_info
-    }
+
+
 class FamilyStatus(str, Enum):
     Single = 'Single / not married'
     Married = 'Married'
@@ -138,20 +131,26 @@ class IncomeType(str, Enum):
     State_servant = 'State servant'
     Pensioner = 'Pensioner'
     Unemployed = 'Unemployed'
+
+class Gender(str, Enum):
+    male = 'M'
+    female= 'F'
+
+
+
 class Validation(BaseModel):
 
     SURNAME: str = Field(default="Undefined", min_length=3, max_length=20)
     NAME: str = Field(default="Undefined", min_length=3, max_length=20)
     PATRONYMIC: str = Field(default="Undefined", min_length=3, max_length=20)
     # TODO:
-    CODE_GENDER: str
+    CODE_GENDER: Gender
     # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
-    DAYS_BIRTH: int
-    DAYS_BIRTH: str
-    PASSPORT: str
+    DAYS_BIRTH: int = Body( ge=7550, lt=25500) # старше 21 и
+    PASSPORT: str  = Body(min_length=10, max_length=10)
 
     NAME_FAMILY_STATUS: FamilyStatus
-    CNT_CHILDREN: int
+    CNT_CHILDREN: int = 0
     NAME_HOUSING_TYPE: HousingType
     FLAG_OWN_CAR: str
     NAME_EDUCATION_TYPE: EducationType
@@ -159,16 +158,16 @@ class Validation(BaseModel):
     OCCUPATION_TYPE: OccupationType
     ORGANIZATION_TYPE: OrganizationType
     # # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
-    DAYS_EMPLOYED: int
-    # DAYS_EMPLOYED: str
+    DAYS_EMPLOYED: int = 0
+
     NAME_INCOME_TYPE: IncomeType
     # # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
     AMT_INCOME_TOTAL: float
     # 'AMT_INCOME_TOTAL': str(float(self.income_total.input.value) / 2),
     #
-    AMT_CREDIT: int
+    AMT_CREDIT: int = 0
     # # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
-    AMT_ANNUITY: float
+    AMT_ANNUITY: float = 0
     # 'AMT_ANNUITY': str(float(self.credit.input.value) / int(self.months.input.value))
 @app.post('/')
 async def post_on_ml(info: Validation):
@@ -180,12 +179,9 @@ async def post_on_ml(info: Validation):
         async with session.post(data_addr) as response:
             result = await response.text()
             print('POST to DATA:', result)
+    return 'SUCCESS'
 
 
-async def send_to_ml(info: Validation):
-    # тут мы принимаем инфо и делаем !!! асинхронно !!! реквест на пост на ML, далее обрабатываем скоринг балл
-    # и возвращаем на фронт
-    pass
 
 if __name__ == '__main__':
     uvicorn.run(app, reload=True)
