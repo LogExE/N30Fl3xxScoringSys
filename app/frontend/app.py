@@ -78,15 +78,13 @@ class MainFormUI(ft.UserControl):
         port = os.getenv("BACKEND_PORT", DEFAULT_BACKEND_PORT)
         url = f'http://{host}:{port}'
 
-        # TODO: пока все параметры имеют строковый тип данных - исправить после создания модели данных на Pydentic
         data_json = {
             'SURNAME': self.surname.value,
             'NAME': self.name.value,
             'PATRONYMIC': self.patronymic.value,
             'CODE_GENDER': self.gender.content.value,
-            # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
-            # 'DAYS_BIRTH': self.birth_date.input.value,
-            'DAYS_BIRTH': str((datetime.now() - datetime.strptime(self.birth_date.value, "%d.%m.%Y")).days),
+            # TODO: вычисления на бэке: DAYS_BIRTH = (datetime.now() - datetime.strptime(DAYS_BIRTH, "%d.%m.%Y")).days
+            'DAYS_BIRTH': self.birth_date.value,
             'PASSPORT': self.passport_series.value + self.passport_number.value,
 
             'NAME_FAMILY_STATUS': self.mapping(self.family.value, NAME_FAMILY_STATUS_dict),
@@ -97,18 +95,14 @@ class MainFormUI(ft.UserControl):
 
             'OCCUPATION_TYPE': self.mapping(self.occupation.value, OCCUPATION_TYPE_dict),
             'ORGANIZATION_TYPE': self.mapping(self.organization.value, ORGANIZATION_TYPE_dict),
-            # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
-            # 'DAYS_EMPLOYED': self.days_employed.input.value,
             'DAYS_EMPLOYED': self.days_employed.value,
             'NAME_INCOME_TYPE': self.mapping(self.income_type.value, NAME_INCOME_TYPE_dict),
-            # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
-            # 'AMT_INCOME_TOTAL': self.income_total.input.value,
-            'AMT_INCOME_TOTAL': str(float(self.income_total.value) / 2),
+            # TODO: вычисления на бэке: AMT_INCOME_TOTAL = AMT_INCOME_TOTAL / 2
+            'AMT_INCOME_TOTAL': self.income_total.value,
 
             'AMT_CREDIT': self.credit.value,
-            # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
-            # 'AMT_ANNUITY': self.months.input.value
-            'AMT_ANNUITY': str(float(self.credit.value) / int(self.months.value))
+            # TODO: вычисления на бэке: AMT_ANNUITY = AMT_CREDIT / AMT_ANNUITY
+            'AMT_ANNUITY': self.months.value
         }
 
         print("Req_body: ", data_json)
