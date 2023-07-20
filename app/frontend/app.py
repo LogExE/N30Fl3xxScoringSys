@@ -1,16 +1,16 @@
-import flet as ft
-import json
-import os
+""" Главный файл Frontend-модуля """
+
 import asyncio
+import os
+
 import aiohttp
-import time
-from datetime import datetime
+import flet as ft
 
 from data import *
+from style.custom_containers import custom_container
+from style.input_dropdown import InputDropdown
 from style.input_fields import InputFields
 from style.input_radio import InputRadio
-from style.input_dropdown import InputDropdown
-from style.custom_containers import CustomContainer
 
 DEFAULT_FLET_PATH = ''
 DEFAULT_FLET_PORT = 50422
@@ -41,8 +41,8 @@ class MainFormUI(ft.UserControl):
         self.car = ft.Checkbox(label="Есть машина", offset=(0, -0.1))
         self.education = InputDropdown(NAME_EDUCATION_TYPE_rus, 3)
 
-        self.occupation = InputDropdown(OCCUPATION_TYPE_rus, 3)
-        self.organization = InputDropdown(ORGANIZATION_TYPE_rus, 3)
+        self.occupation = InputDropdown(sorted(OCCUPATION_TYPE_rus), 3)
+        self.organization = InputDropdown(sorted(ORGANIZATION_TYPE_rus), 3)
         self.days_employed = InputFields("", 3, 3, suffix_text="лет")
         self.income_type = InputDropdown(NAME_INCOME_TYPE_rus, 1.5)
         self.income_total = InputFields("Среднегодовой доход", 1.42, suffix_text="\u20BD")
@@ -88,15 +88,17 @@ class MainFormUI(ft.UserControl):
         super().__init__()
 
     def mapping(self, val, dct):
-        return None if val is None else dct[val]
+        """ Преобразование значений выпадающий полей в формат, с которым работает ML-модель """
+        return dct[val] if val else None
 
     async def submit_clicked(self, e):
+        """ Обработчик нажатия на кнопку - отправка запроса на Backend """
         self.submit.visible = False
         self.progress.visible = True
         self.score.value = None
         self.update()
 
-        """ Отправка данных из формы на сервер (в формате JSON) """
+        # Отправка данных из формы на сервер (в формате JSON)
         host = os.getenv("BACKEND_HOST", DEFAULT_BACKEND_HOST)
         port = os.getenv("BACKEND_PORT", DEFAULT_BACKEND_PORT)
         url = f'http://{host}:{port}'
@@ -129,6 +131,7 @@ class MainFormUI(ft.UserControl):
         }
 
         print("Req_body: ", data_json)
+
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=data_json) as response:
                 resp = await response.json()
@@ -136,7 +139,7 @@ class MainFormUI(ft.UserControl):
                 print("\nResp_body: ", resp)
 
                 # Подсвечивание полей, заполненных неправильно
-                err_fields = [err_dict['loc'][1] for err_dict in resp['detail']] if resp else []
+                err_fields = [] if resp == 'SUCCESS' else [err_dict['loc'][1] for err_dict in resp['detail']]
 
                 for field in self.fields.keys():
                     if field != 'PASSPORT':
@@ -185,17 +188,17 @@ class MainFormUI(ft.UserControl):
                     ft.Divider(height=25, color="transparent"),
 
                     # Информация для идентификации клиента
-                    CustomContainer([
+                    custom_container([
                         ft.Row([
-                            ft.Text("ФИО:  "),
-                            ft.VerticalDivider(width=90),
+                            ft.Text("ФИО:"),
+                            ft.VerticalDivider(width=104),
                             self.surname,
                             self.name,
                             self.patronymic,
                         ]),
                         ft.Row([
-                            ft.Text("Дата рождения:  "),
-                            ft.VerticalDivider(width=21),
+                            ft.Text("Дата рождения:"),
+                            ft.VerticalDivider(width=31),
                             self.birth_date,
 
                             ft.VerticalDivider(width=1),
@@ -210,11 +213,10 @@ class MainFormUI(ft.UserControl):
                     ]),
 
                     # Информация о семье
-                    CustomContainer([
+                    custom_container([
                         ft.Row([
-                            ft.Text("Семейное положение:"),
-                            self.family,
-                            self.children
+                            ft.Text("Семейное положение: "),
+                            self.family, self.children
                         ]),
                         ft.Divider(height=10, color="transparent"),
                         ft.Row([
@@ -230,29 +232,29 @@ class MainFormUI(ft.UserControl):
                     ]),
 
                     # Информация о работе
-                    CustomContainer([
+                    custom_container([
                         ft.Row([
                             ft.Text("Тип занятости:"),
                             ft.VerticalDivider(width=42), self.occupation,
                         ]),
                         ft.Divider(height=20, color="transparent"),
                         ft.Row([
-                            ft.Text("Тип организации:"),
+                            ft.Text("Тип организации: "),
                             ft.VerticalDivider(width=22), self.organization,
                         ]),
                         ft.Divider(height=10, color="transparent"),
                         ft.Row([
                             ft.Text("Стаж по текущей\nработе:"),
-                            ft.VerticalDivider(width=22), self.days_employed,
+                            ft.VerticalDivider(width=28), self.days_employed,
                         ]),
                         ft.Row([
-                            ft.Text("Тип дохода:"),
+                            ft.Text("Тип дохода: "),
                             ft.VerticalDivider(width=60), self.income_type, self.income_total
                         ]),
                     ]),
 
                     # Информация о кредите
-                    CustomContainer([
+                    custom_container([
                         ft.Row([self.credit, self.months])
                     ]),
 
@@ -270,9 +272,8 @@ class MainFormUI(ft.UserControl):
 
 
 def main(page: ft.Page):
-    page.theme = ft.Theme(
-        color_scheme=ft.ColorScheme(primary=MAIN_COLOR)
-    )
+    """ Основная страница """
+    page.theme = ft.Theme(color_scheme=ft.ColorScheme(primary=MAIN_COLOR))
     page.theme_mode = ft.ThemeMode.LIGHT
     page.padding = 30
     page.vertical_alignment = ft.MainAxisAlignment.START

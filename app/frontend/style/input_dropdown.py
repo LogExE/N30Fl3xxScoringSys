@@ -1,8 +1,11 @@
+""" Поле с вариантами ответа в виде выпажающего списка """
+
 import flet as ft
 from style.custom_containers import ONE_FIELD_WIDTH
 
 
 class InputDropdown(ft.Dropdown):
+    """ Поле с вариантами ответа в виде выпажающего списка """
     def __init__(self, options, width):
         super().__init__()
         self.height = 40
@@ -20,13 +23,16 @@ class InputDropdown(ft.Dropdown):
         self.focused_border_width = 2
         self.hint_text = " "
 
-    def set_error(self, e):
-        if e:
+    def set_error(self, is_error):
+        """ Установка поля в состояние 'заполнено корректно'/'заполнено с ошибками' """
+        if is_error:
+            # заполнено с ошибками
             self.border_color = ft.colors.RED_500
             self.focused_border_color = ft.colors.RED_500
             self.border_width = 2
             self.hint_text = "Выберите значение"
         else:
+            # заполнено корректно
             self.border_color = ft.colors.BLACK
             self.focused_border_color = ft.colors.DEEP_PURPLE_500
             self.border_width = 1

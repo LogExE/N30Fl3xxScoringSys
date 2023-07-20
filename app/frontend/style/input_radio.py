@@ -1,8 +1,11 @@
+""" Поле с вариантами ответа в виде переключателя"""
+
 import flet as ft
 from style.custom_containers import ONE_FIELD_WIDTH
 
 
 class InputRadio(ft.Container):
+    """ Текстовое поле для ввода в виде переключателя """
     def __init__(self, options):
         super().__init__()
         self.content = ft.RadioGroup(ft.Row(
@@ -14,10 +17,13 @@ class InputRadio(ft.Container):
         self.border = None
         self.border_radius = 5
 
-    def set_error(self, e):
-        if e:
+    def set_error(self, is_error):
+        """ Установка поля в состояние 'заполнено корректно'/'заполнено с ошибками' """
+        if is_error:
+            # заполнено с ошибками
             self.border = ft.border.all(width=2, color=ft.colors.RED_500)
         else:
+            # заполнено корректно
             self.border = None
 
         self.update()

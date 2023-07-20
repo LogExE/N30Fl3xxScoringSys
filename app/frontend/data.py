@@ -25,12 +25,13 @@ NAME_HOUSING_TYPE_dict = dict(zip(NAME_HOUSING_TYPE_rus, NAME_HOUSING_TYPE_eng))
 
 # Тип образования
 NAME_EDUCATION_TYPE_rus = [
-    "Среднее/средне-специальное образование", "Высшее образование", "Незаконченное высшее образование",
-    "Неполное среднее образование", "Академическая степень"
+    "Среднее/средне-специальное образование", "Высшее образование",
+    "Незаконченное высшее образование", "Неполное среднее образование",
+    "Академическая степень"
 ]
 NAME_EDUCATION_TYPE_eng = [
-    "Secondary / secondary special", "Higher education", "Incomplete higher",
-    "Lower secondary", "Academic degree"
+    "Secondary / secondary special", "Higher education",
+    "Incomplete higher", "Lower secondary", "Academic degree"
 ]
 NAME_EDUCATION_TYPE_dict = dict(zip(NAME_EDUCATION_TYPE_rus, NAME_EDUCATION_TYPE_eng))
 
