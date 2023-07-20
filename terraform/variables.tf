@@ -10,7 +10,6 @@ variable "folder_id" {
 
 variable "service_key_path" {
   type    = string
-  default = "C:/Users/Vladimir/authorized_key.json"
 }
 
 variable "instance_name" {
