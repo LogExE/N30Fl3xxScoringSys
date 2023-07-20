@@ -169,6 +169,7 @@ class Validation(BaseModel):
     # # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
     AMT_ANNUITY: float = 0
     # 'AMT_ANNUITY': str(float(self.credit.input.value) / int(self.months.input.value))
+    # test1111
 @app.post('/')
 async def post_on_ml(info: Validation):
     # Шаг 1: Прием валидированных данных info: Validation
@@ -179,7 +180,7 @@ async def post_on_ml(info: Validation):
         async with session.post(data_addr) as response:
             result = await response.text()
             print('POST to DATA:', result)
-    return 'SUCCESS'
+            return 'SUCCESS'
 
 
 
