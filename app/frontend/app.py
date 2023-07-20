@@ -62,6 +62,29 @@ class MainFormUI(ft.UserControl):
             weight=ft.FontWeight.W_700,
             color=MAIN_COLOR
         )
+
+        self.fields = {
+            'SURNAME': self.surname,
+            'NAME': self.name,
+            'PATRONYMIC': self.patronymic,
+            'CODE_GENDER': self.gender,
+            'DAYS_BIRTH': self.birth_date,
+            'PASSPORT': [self.passport_series, self.passport_number],
+
+            'NAME_FAMILY_STATUS': self.family,
+            'CNT_CHILDREN': self.children,
+            'NAME_HOUSING_TYPE': self.house,
+            'NAME_EDUCATION_TYPE': self.education,
+
+            'OCCUPATION_TYPE': self.occupation,
+            'ORGANIZATION_TYPE': self.organization,
+            'DAYS_EMPLOYED': self.days_employed,
+            'NAME_INCOME_TYPE': self.income_type,
+            'AMT_INCOME_TOTAL': self.income_total,
+
+            'AMT_CREDIT': self.credit,
+            'AMT_ANNUITY': self.months
+        }
         super().__init__()
 
     def mapping(self, val, dct):
@@ -108,23 +131,31 @@ class MainFormUI(ft.UserControl):
         print("Req_body: ", data_json)
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=data_json) as response:
-                data = await response.text()
+                resp = await response.json()
 
-                time.sleep(1.5)  # для демонстрации!!
+                print("\nResp_body: ", resp)
 
-                score = 100  # позже заменим на data
+                # Подсвечивание полей, заполненных неправильно
+                err_fields = [err_dict['loc'][1] for err_dict in resp['detail']] if resp else []
 
+                for field in self.fields.keys():
+                    if field != 'PASSPORT':
+                        self.fields[field].set_error(field in err_fields)
+                    else:
+                        for f in self.fields[field]:
+                            f.set_error(field in err_fields)
+
+                # Вывод результата
+                score = 100  # позже заменим на скоринговый балл
                 self.submit.visible = True
                 self.progress.visible = False
-                self.score.value = f"Ваш крединый рейтинг: {score}"
 
-                # демонстрация отображения ошибок
-                # self.family.set_error(True)
-                # self.name.set_error(True)
-                # self.gender.set_error(True)
+                if not err_fields:
+                    self.score.value = f"Ваш крединый рейтинг: {score}"
+                else:
+                    self.score.value = f"Пожалуйста, заполните форму правильно :("
 
                 self.update()
-                print("\nResp_body: ", data)
 
     def build(self):
         """ Содержимое формы """
