@@ -62,29 +62,6 @@ class MainFormUI(ft.UserControl):
             weight=ft.FontWeight.W_700,
             color=MAIN_COLOR
         )
-
-        self.fields = {
-            'SURNAME': self.surname,
-            'NAME': self.name,
-            'PATRONYMIC': self.patronymic,
-            'CODE_GENDER': self.gender,
-            'DAYS_BIRTH': self.birth_date,
-            'PASSPORT': [self.passport_series, self.passport_number],
-
-            'NAME_FAMILY_STATUS': self.family,
-            'CNT_CHILDREN': self.children,
-            'NAME_HOUSING_TYPE': self.house,
-            'NAME_EDUCATION_TYPE': self.education,
-
-            'OCCUPATION_TYPE': self.occupation,
-            'ORGANIZATION_TYPE': self.organization,
-            'DAYS_EMPLOYED': self.days_employed,
-            'NAME_INCOME_TYPE': self.income_type,
-            'AMT_INCOME_TOTAL': self.income_total,
-
-            'AMT_CREDIT': self.credit,
-            'AMT_ANNUITY': self.months
-        }
         super().__init__()
 
     def mapping(self, val, dct):
@@ -101,13 +78,15 @@ class MainFormUI(ft.UserControl):
         port = os.getenv("BACKEND_PORT", DEFAULT_BACKEND_PORT)
         url = f'http://{host}:{port}'
 
+        # TODO: пока все параметры имеют строковый тип данных - исправить после создания модели данных на Pydentic
         data_json = {
             'SURNAME': self.surname.value,
             'NAME': self.name.value,
             'PATRONYMIC': self.patronymic.value,
             'CODE_GENDER': self.gender.content.value,
-            # TODO: вычисления на бэке: DAYS_BIRTH = (datetime.now() - datetime.strptime(DAYS_BIRTH, "%d.%m.%Y")).days
-            'DAYS_BIRTH': self.birth_date.value,
+            # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
+            # 'DAYS_BIRTH': self.birth_date.input.value,
+            'DAYS_BIRTH': str((datetime.now() - datetime.strptime(self.birth_date.value, "%d.%m.%Y")).days),
             'PASSPORT': self.passport_series.value + self.passport_number.value,
 
             'NAME_FAMILY_STATUS': self.mapping(self.family.value, NAME_FAMILY_STATUS_dict),
@@ -118,44 +97,40 @@ class MainFormUI(ft.UserControl):
 
             'OCCUPATION_TYPE': self.mapping(self.occupation.value, OCCUPATION_TYPE_dict),
             'ORGANIZATION_TYPE': self.mapping(self.organization.value, ORGANIZATION_TYPE_dict),
+            # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
+            # 'DAYS_EMPLOYED': self.days_employed.input.value,
             'DAYS_EMPLOYED': self.days_employed.value,
             'NAME_INCOME_TYPE': self.mapping(self.income_type.value, NAME_INCOME_TYPE_dict),
-            # TODO: вычисления на бэке: AMT_INCOME_TOTAL = AMT_INCOME_TOTAL / 2
-            'AMT_INCOME_TOTAL': self.income_total.value,
+            # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
+            # 'AMT_INCOME_TOTAL': self.income_total.input.value,
+            'AMT_INCOME_TOTAL': str(float(self.income_total.value) / 2),
 
             'AMT_CREDIT': self.credit.value,
-            # TODO: вычисления на бэке: AMT_ANNUITY = AMT_CREDIT / AMT_ANNUITY
-            'AMT_ANNUITY': self.months.value
+            # TODO: перенести вычисления на бэк, чтобы они происходили после валидации
+            # 'AMT_ANNUITY': self.months.input.value
+            'AMT_ANNUITY': str(float(self.credit.value) / int(self.months.value))
         }
 
         print("Req_body: ", data_json)
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=data_json) as response:
-                resp = await response.json()
+                data = await response.text()
 
-                print("\nResp_body: ", resp)
+                time.sleep(1.5)  # для демонстрации!!
 
-                # Подсвечивание полей, заполненных неправильно
-                err_fields = [err_dict['loc'][1] for err_dict in resp['detail']] if resp else []
+                score = 100  # позже заменим на data
 
-                for field in self.fields.keys():
-                    if field != 'PASSPORT':
-                        self.fields[field].set_error(field in err_fields)
-                    else:
-                        for f in self.fields[field]:
-                            f.set_error(field in err_fields)
-
-                # Вывод результата
-                score = 100  # позже заменим на скоринговый балл
                 self.submit.visible = True
                 self.progress.visible = False
+                self.score.value = f"Ваш крединый рейтинг: {score}"
 
-                if not err_fields:
-                    self.score.value = f"Ваш крединый рейтинг: {score}"
-                else:
-                    self.score.value = f"Пожалуйста, заполните форму правильно :("
+                # демонстрация отображения ошибок
+                # self.family.set_error(True)
+                # self.name.set_error(True)
+                # self.gender.set_error(True)
 
                 self.update()
+                print("\nResp_body: ", data)
 
     def build(self):
         """ Содержимое формы """

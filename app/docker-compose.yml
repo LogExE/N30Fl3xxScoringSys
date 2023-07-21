@@ -10,7 +10,6 @@ services:
         - 80:80
       depends_on:
         - frontend
-      restart: always
   frontend:
     build: ./frontend
     container_name: scoringsys-front
@@ -22,7 +21,6 @@ services:
       - 50422
     depends_on:
       - backend
-    restart: always
   backend:
     build: ./backend
     container_name: scoringsys-back
@@ -36,7 +34,6 @@ services:
       - UVICORN_ROOT_PATH=/api
     expose:
       - 8000
-    restart: always
   ml:
     build: ./ML
     container_name: scoringsys-ml
@@ -45,4 +42,3 @@ services:
     - UVICORN_PORT=8888
     expose:
       - 8888
-    restart: always
