@@ -1,0 +1,21 @@
+{
+    "SURNAME": "Простенко",
+    "NAME": "Марина",
+    "PATRONYMIC": "Сергеевна",
+    "CODE_GENDER": "F",
+    "DAYS_BIRTH": 8711,
+    "PASSPORT": "5456765434",
+    "NAME_FAMILY_STATUS": "Civil marriage",
+    "CNT_CHILDREN": 1,
+    "NAME_HOUSING_TYPE": "House / apartment",
+    "FLAG_OWN_CAR": 0,
+    "NAME_EDUCATION_TYPE": "Higher education",
+    "OCCUPATION_TYPE": "Cooking staff",
+    "ORGANIZATION_TYPE": "Culture",
+    "DAYS_EMPLOYED": 12,
+    "NAME_INCOME_TYPE": "Working",
+    "AMT_INCOME_TOTAL": 150000.0,
+    "AMT_CREDIT": 120000.0,
+    "AMT_ANNUITY": 10000.0,
+    "MONTHS_CREDIT": 12
+}
