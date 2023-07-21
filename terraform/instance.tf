@@ -16,6 +16,7 @@ resource "yandex_compute_instance" "neopr" {
   boot_disk {
     initialize_params {
       image_id = yandex_compute_image.debian11.id
+      size = 10
     }
   }
 
