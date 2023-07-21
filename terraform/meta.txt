@@ -6,3 +6,4 @@ users:
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     ssh-authorized-keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFCsepoMj3yOa8uU18XuJs5zEA8QzdRNdnTfP4llyXqc awesome149712@gmail.com
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN6M3CaZWdDUhTqdP7Srgzfd5wpzFSJ3Mzp9vJL+DbBC awesome149712@gmail.com
