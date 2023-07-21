@@ -1,0 +1,6 @@
+virtualmachines:
+  hosts:
+    vm01:
+      ansible_host: 51.250.26.112
+  vars:
+    ansible_user: adminus
