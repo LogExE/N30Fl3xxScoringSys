@@ -19,6 +19,13 @@ jobs:
           username: ${{ secrets.DOCKER_LOGIN }}
           password: ${{ secrets.DOCKER_PASSWD }}
       -
+        name: Build and push nginx copy
+        uses: docker/build-push-action@v4
+        with:
+          context: ./app/nginx/
+          push: true
+          tags: logxx/scoringsys-nginx:latest
+      -
         name: Build and push frontend
         uses: docker/build-push-action@v4
         with:
