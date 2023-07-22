@@ -45,3 +45,6 @@ jobs:
       id: tfapply
       run: terraform apply --auto-approve --input=false --var="service_token=/home/runner/key.json"
       working-directory: ./terraform
+    
+    - name: Test output
+      run: echo ${{steps.tfapply.outputs.external_ip}}
