@@ -9,7 +9,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: ssh setup
-        shell: bash
         run: |
           eval `ssh-agent -s`
           mkdir -p /home/runner/.ssh

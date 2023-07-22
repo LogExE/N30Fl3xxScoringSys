@@ -27,11 +27,10 @@ jobs:
       working-directory: ./terraform
 
     - name: Prepare Yandex key
-      shell: bash
       run: |
         touch key.json
         chmod 700 key.json
-        echo -e ${{secrets.YANDEX_KEY}} > key.json
+        echo -e "${{secrets.YANDEX_KEY}}" > key.json
 
     - name: Terraform Plan
       run: terraform plan -input=false -var="service_key_path=key.json"
