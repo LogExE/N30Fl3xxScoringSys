@@ -72,7 +72,9 @@
       copy:
         src: ../app/docker-compose.yml
         dest: .
+    - name: Pull images
+      command:
+        cmd: docker compose pull
     - name: Launch docker compose
       command:
-        cmd: docker compose pull && 
-          docker compose up --detach --no-build
+        cmd: docker compose up --detach --no-build
