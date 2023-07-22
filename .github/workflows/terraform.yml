@@ -37,6 +37,3 @@ jobs:
       working-directory: ./terraform
     - name: Save host
       run: echo "ANSIBLE_HOST=${{steps.tfapply.outputs.external_ip}}" >> $GITHUB_ENV
-  ansible:
-    needs: [terraform]
-    uses: ./.github/workflows/ansible.yml
