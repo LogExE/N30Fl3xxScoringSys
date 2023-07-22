@@ -1,6 +1,11 @@
 name: 'Terraform deploy'
 
-on: [workflow_call]
+on: 
+  workflow_call:
+    outpus:
+      external_ip:
+        description: "The ip of created instance"
+        value: ${{ jobs.terraform.outputs.external_ip }}
 
 jobs:
   terraform:
@@ -8,7 +13,6 @@ jobs:
 
     outputs:
       external_ip: 
-        description: "The ip of created instance"
         value: ${{ steps.tfapply.outputs.external_ip }}
 
     steps:

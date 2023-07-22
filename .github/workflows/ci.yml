@@ -25,6 +25,6 @@ jobs:
   ansible:
     needs: [docker, terraform]
     uses: ./.github/workflows/ansible.yml
-    secrets: inherit
     with:
       external_ip: ${{ needs.terraform.outputs.external_ip }}
+    secrets: inherit
