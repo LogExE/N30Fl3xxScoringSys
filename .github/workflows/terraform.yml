@@ -30,7 +30,10 @@ jobs:
       working-directory: ./terraform
 
     - name: Prepare Yandex key
-      run: echo -e ${{YANDEX_KEY}} > key.json
+      run: |
+        touch key.json
+        chmod 700 key.json
+        echo -e ${{secrets.YANDEX_KEY}} > key.json
 
     - name: Terraform Apply
       run: terraform apply -auto-approve -input=false -var="service_key_path=key.json"
