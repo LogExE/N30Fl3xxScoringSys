@@ -36,7 +36,10 @@ jobs:
         echo -e ${{secrets.YANDEX_KEY}} > key.json
 
     - name: Terraform Apply
+      id: tfapply
       run: terraform apply -auto-approve -input=false -var="service_key_path=key.json"
       working-directory: ./terraform
+    - name: Save host
+      run: echo "ANSIBLE_HOST=${{steps.tfapply.outputs.external_ip}}" >> $GITHUB_ENV
   ansible:
     uses: ./.github/workflows/ansible.yml
