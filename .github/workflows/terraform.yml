@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      external_ip: ${{ steps.tfapply.outputs.external_ip }}
+      external_ip: ${{ steps.tfout.outputs.external_ip }}
 
     steps:
     - name: Checkout
@@ -42,10 +42,10 @@ jobs:
       working-directory: ./terraform
 
     - name: Terraform Apply
-      id: tfapply
       run: terraform apply --auto-approve --input=false --var="service_token=/home/runner/key.json"
       working-directory: ./terraform
     
     - name: Save output
+      id: tfout
       run: echo "external_ip=$(terraform output --raw external_ip)" >> $GITHUB_OUTPUT
       working-directory: ./terraform
