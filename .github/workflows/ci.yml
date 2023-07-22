@@ -6,6 +6,7 @@ on:
       - app/**
       - terraform/**
       - ansible/**
+      - .github/workflows/ci.yml
       - .github/workflows/pylint.yml
       - .github/workflows/docker.yml
       - .github/workflows/ansible.yml
