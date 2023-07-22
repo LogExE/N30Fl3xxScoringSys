@@ -12,8 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      external_ip: 
-        value: ${{ steps.tfapply.outputs.external_ip }}
+      external_ip: ${{ steps.tfapply.outputs.external_ip }}
 
     steps:
     - name: Checkout
