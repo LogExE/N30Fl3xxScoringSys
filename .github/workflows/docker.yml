@@ -1,6 +1,5 @@
-name: ci
-
-on: push
+name: docker build and push
+on: [workflow_call]
 
 jobs:
   docker:
