@@ -1,11 +1,6 @@
 name: 'Terraform deploy'
 
-on:
-  push:
-    branches: [ "development" ]
-    paths:
-      - terraform/**
-      - .github/workflows/terraform.yml
+on: [workflow_call]
 
 jobs:
   terraform:
