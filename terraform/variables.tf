@@ -9,7 +9,7 @@ variable "folder_id" {
 }
 
 variable "service_key_path" {
-  type    = string
+  type = string
 }
 
 variable "instance_name" {
@@ -38,6 +38,6 @@ variable "dns_name" {
 }
 
 variable "dns_zone" {
-  type = string
+  type    = string
   default = "ourscoringsys.ru."
 }

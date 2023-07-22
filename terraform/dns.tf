@@ -1,8 +1,8 @@
 resource "yandex_dns_zone" "zone1" {
-  name        = var.dns_name
+  name = var.dns_name
 
-  zone             = var.dns_zone
-  public           = true
+  zone   = var.dns_zone
+  public = true
 }
 
 #resource "yandex_dns_recordset" "inst_record" {

@@ -16,7 +16,7 @@ resource "yandex_compute_instance" "neopr" {
   boot_disk {
     initialize_params {
       image_id = yandex_compute_image.debian11.id
-      size = 10
+      size     = 10
     }
   }
 
@@ -24,9 +24,9 @@ resource "yandex_compute_instance" "neopr" {
     subnet_id = yandex_vpc_subnet.subnet-1.id
     nat       = true
     nat_dns_record {
-       fqdn = "ourscoringys.ru." 
-       dns_zone_id = yandex_dns_zone.zone1.id
-       ttl = 120
+      fqdn        = "ourscoringys.ru."
+      dns_zone_id = yandex_dns_zone.zone1.id
+      ttl         = 120
     }
   }
 
