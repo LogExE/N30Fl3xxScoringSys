@@ -23,6 +23,11 @@ resource "yandex_compute_instance" "neopr" {
   network_interface {
     subnet_id = yandex_vpc_subnet.subnet-1.id
     nat       = true
+    nat_dns_record {
+       fqdn = "ourscoringys.ru." 
+       dns_zone_id = yandex_dns_zone.zone1.id
+       ttl = 120
+    }
   }
 
   scheduling_policy {
