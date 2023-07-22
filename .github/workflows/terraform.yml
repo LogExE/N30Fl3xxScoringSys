@@ -27,6 +27,7 @@ jobs:
       working-directory: ./terraform
 
     - name: Prepare Yandex key
+      shell: bash
       run: |
         touch key.json
         chmod 700 key.json
