@@ -8,7 +8,7 @@ variable "folder_id" {
   default = "b1gsdge91vukh1d8u77r"
 }
 
-variable "service_key_path" {
+variable "service_token" {
   type = string
 }
 

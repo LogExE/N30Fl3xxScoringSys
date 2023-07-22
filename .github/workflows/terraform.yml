@@ -26,19 +26,13 @@ jobs:
       run: terraform fmt -check
       working-directory: ./terraform
 
-    - name: Prepare Yandex key
-      run: |
-        touch /home/runner/key.json
-        chmod 700 /home/runner/key.json
-        echo "${{secrets.YANDEX_KEY}}" > /home/runner/key.json
-
     - name: Terraform Plan
-      run: terraform plan -input=false -var="service_key_path=/home/runner/key.json"
+      run: terraform plan -input=false -var="service_token=${{secrets.YANDEX_TOKEN}}"
       working-directory: ./terraform
 
     - name: Terraform Apply
       id: tfapply
-      run: terraform apply -auto-approve -input=false -var="service_key_path=/home/runner/key.json"
+      run: terraform apply -auto-approve -input=false -var="service_token=${{secrets.YANDEX_TOKEN}}"
       working-directory: ./terraform
     - name: Save host
       run: echo "ANSIBLE_HOST=${{steps.tfapply.outputs.external_ip}}" >> $GITHUB_ENV
