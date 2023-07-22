@@ -2,7 +2,7 @@ name: 'Terraform deploy'
 
 on: 
   workflow_call:
-    outpus:
+    outputs:
       external_ip:
         description: "The ip of created instance"
         value: ${{ jobs.terraform.outputs.external_ip }}
