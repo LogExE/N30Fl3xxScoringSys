@@ -30,7 +30,7 @@ jobs:
       run: |
         touch /home/runner/key.json
         chmod 700 /home/runner/key.json
-        echo -e "${{secrets.YANDEX_KEY}}" > /home/runner/key.json
+        echo "${{secrets.YANDEX_KEY}}" > /home/runner/key.json
 
     - name: Terraform Plan
       run: terraform plan -input=false -var="service_key_path=/home/runner/key.json"
