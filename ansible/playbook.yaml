@@ -56,10 +56,19 @@
       become: true
     - name: reset connection
       meta: reset_connection
+    - name: Check docker compose file
+      stat:
+        path: ./docker-compose.yml
+      register: stat_res
+    - name: Down docker compose if .yml exists
+      command:
+        cmd: docker compose down
+      when: stat_res.stat.exists
     - name: copy docker-compose.yml
       copy:
         src: docker-compose.yml
-        dest: tmp/
+        dest: .
     - name: Launch docker compose
       command:
-        cmd: docker compose -f ./tmp/docker-compose.yml up -d
+        cmd: docker compose pull && 
+          docker compose up -d
