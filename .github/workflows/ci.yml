@@ -1,0 +1,14 @@
+name: ci 
+on:
+  push:
+    branches: ["development"]
+    paths:
+      - app/**
+
+jobs:
+  #  pylint:
+  #   uses: ./.github/workflows/pylint.yml
+  docker:
+    uses: ./.github/workflows/docker.yml
+  ansible:
+    uses: ./.github/workflows/ansible.yml

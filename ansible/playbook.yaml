@@ -1,0 +1,78 @@
+- hosts: virtualmachines
+  name: Deploy compose
+  tasks:
+    - name: Ping
+      ansible.builtin.ping:
+    - name: Install docker deps
+      apt:
+        pkg:
+          - ca-certificates
+          - curl
+          - gnupg
+        state: latest
+        update_cache: true
+      become: true
+    - name: Add docker gpg key
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+      become: true
+    - name: Add docker repo
+      apt_repository:
+        repo: deb https://download.docker.com/linux/debian bullseye stable
+      become: true
+    - name: Update apt + install docker
+      apt:
+        pkg:
+          - docker-ce
+          - docker-compose-plugin
+        state: latest
+        update_cache: true
+      become: true
+    - name: Install pip3
+      apt:
+        name: python3-pip
+        state: latest
+        update_cache: true
+      become: true
+    - name: Install pip docker sdk
+      ansible.builtin.pip:
+        name: docker
+    - name: Verify docker stuff
+      service:
+        name: docker
+        state: started
+        enabled: yes
+      become: true
+    - name: Ensure group "docker" exists
+      ansible.builtin.group:
+        name: docker
+        state: present
+    - name: Get the username
+      command:
+        whoami
+      register: whoami_res 
+    - name: Add user to docker group
+      user:
+        name: "{{ whoami_res.stdout }}"
+        append: yes
+        groups: docker
+      become: true
+    - name: reset connection
+      meta: reset_connection
+    - name: Check docker compose file
+      stat:
+        path: ../app/docker-compose.yml
+      register: stat_res
+    - name: Down docker compose if .yml exists
+      command:
+        cmd: docker compose down
+      when: stat_res.stat.exists
+    - name: copy docker-compose.yml
+      copy:
+        src: docker-compose.yml
+        dest: .
+    - name: Launch docker compose
+      command:
+        cmd: docker compose pull && 
+          docker compose up -d --no-build

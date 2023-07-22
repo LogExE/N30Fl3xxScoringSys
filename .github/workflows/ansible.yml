@@ -1,0 +1,21 @@
+name: Ansible
+
+on: [workflow_call]
+
+jobs:
+  run-playbook:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: ssh setup
+        run: |
+          eval `ssh-agent -s`
+          mkdir -p /home/runner/.ssh
+          touch /home/runner/.ssh/id_ed25519
+          chmod 700 /home/runner/.ssh/id_ed25519
+          echo -e "${{secrets.ANSIBLE_SSH_KEY}}" > /home/runner/.ssh/id_ed25519
+          ssh-keyscan -t rsa,dsa,ecdsa,ed25519 ${{secrets.SSH_HOST}} >> /home/runner/.ssh/known_hosts
+      - name: Run ansible
+        run: ansible-playbook -u ${{secrets.ANSIBLE_DEPLOY_USER}} -i ${{env.ANSIBLE_HOST}}, playbook.yml
+        working-directory: ./ansible
