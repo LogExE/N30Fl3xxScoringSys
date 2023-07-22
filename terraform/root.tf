@@ -22,5 +22,5 @@ provider "yandex" {
   cloud_id                 = var.cloud_id
   folder_id                = var.folder_id
   zone                     = "ru-central1-b"
-  service_account_key_file = var.service_token
+  service_account_key_file = file(var.service_token)
 }

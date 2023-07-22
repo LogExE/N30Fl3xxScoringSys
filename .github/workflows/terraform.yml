@@ -26,15 +26,22 @@ jobs:
       run: terraform fmt -check
       working-directory: ./terraform
 
+    - name: Prepare ssh
+      run: |
+        touch /home/runner/key.json
+        chmod 700 /home/runner/key.json
+        echo "${{secrets.YANDEX_KEY}}" > /home/runner/key.json
+
     - name: Terraform Plan
-      run: terraform plan --input=false --var="service_token=${{secrets.YANDEX_KEY}}"
+      run: terraform plan --input=false --var="service_token=/home/runner/key.json"
       working-directory: ./terraform
 
     - name: Terraform Apply
       id: tfapply
-      run: terraform apply --auto-approve --input=false --var="service_token=${{secrets.YANDEX_KEY}}"
+      run: terraform apply --auto-approve --input=false --var="service_token=/home/runner/key.json"
       working-directory: ./terraform
     - name: Save host
       run: echo "ANSIBLE_HOST=${{steps.tfapply.outputs.external_ip}}" >> $GITHUB_ENV
   ansible:
+    needs: [terraform]
     uses: ./.github/workflows/ansible.yml
