@@ -48,9 +48,13 @@
       ansible.builtin.group:
         name: docker
         state: present
+    - name: Get the username
+      command:
+        whoami
+      register: whoami_res 
     - name: Add user to docker group
       user:
-        name: adminus
+        name: "{{ whoami_res.stdout }}"
         append: yes
         groups: docker
       become: true
