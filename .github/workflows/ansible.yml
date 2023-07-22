@@ -9,7 +9,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: ssh setup
-
+        run: echo oops
       - name: Run ansible
         run: ansible-playbook -u ${{secrets.ANSIBLE_DEPLOY_USER}} -i playbook.yml
         working-directory: ./ansible
