@@ -2,6 +2,7 @@ version: "3"
 
 services:
   nginx:
+      image: logxx/scoringsys-nginx
       build: ./nginx
       container_name: scoringsys-nginx
       ports:
@@ -10,6 +11,7 @@ services:
         - frontend
       restart: always
   frontend:
+    image: logxx/scoringsys-front
     build: ./frontend
     container_name: scoringsys-front
     environment:
@@ -22,6 +24,7 @@ services:
       - backend
     restart: always
   backend:
+    image: logxx/scoringsys-back
     build: ./backend
     container_name: scoringsys-back
     environment:
@@ -36,6 +39,7 @@ services:
       - 8000
     restart: always
   ml:
+    image: logxx/scoringsys-ml
     build: ./ML
     container_name: scoringsys-ml
     environment:

@@ -62,7 +62,7 @@
       meta: reset_connection
     - name: Check docker compose file
       stat:
-        path: ./docker-compose.yml
+        path: ../app/docker-compose.yml
       register: stat_res
     - name: Down docker compose if .yml exists
       command:
@@ -75,4 +75,4 @@
     - name: Launch docker compose
       command:
         cmd: docker compose pull && 
-          docker compose up -d
+          docker compose up -d --no-build

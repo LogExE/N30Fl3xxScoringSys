@@ -17,5 +17,5 @@ jobs:
           echo -e "${{secrets.ANSIBLE_SSH_KEY}}" > /home/runner/.ssh/id_ed25519
           ssh-keyscan -t rsa,dsa,ecdsa,ed25519 ${{secrets.SSH_HOST}} >> /home/runner/.ssh/known_hosts
       - name: Run ansible
-        run: ansible-playbook -u ${{secrets.ANSIBLE_DEPLOY_USER}} -i playbook.yml
+        run: ansible-playbook -u ${{secrets.ANSIBLE_DEPLOY_USER}} -i inventory.yml playbook.yml
         working-directory: ./ansible
