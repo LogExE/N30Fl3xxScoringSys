@@ -5,6 +5,7 @@ on:
     branches: [ "development" ]
     paths:
       - terraform/**
+      - .github/workflows/terraform.yml
 
 jobs:
   terraform:

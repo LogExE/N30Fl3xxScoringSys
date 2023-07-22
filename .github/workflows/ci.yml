@@ -4,6 +4,9 @@ on:
     branches: ["development"]
     paths:
       - app/**
+      - .github/workflows/pylint.yml
+      - .github/workflows/docker.yml
+      - .github/workflows/ansible.yml
 
 jobs:
   #  pylint:
