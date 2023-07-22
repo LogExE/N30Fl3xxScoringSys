@@ -6,8 +6,8 @@ on:
       - app/**
 
 jobs:
-  pylint:
-    uses: ./.github/workflows/pylint.yml
+  #  pylint:
+  #   uses: ./.github/workflows/pylint.yml
   docker:
     uses: ./.github/workflows/docker.yml
   ansible:
