@@ -1,4 +1,4 @@
-- hosts: virtualmachines
+- hosts: all
   name: Deploy compose
   tasks:
     - name: Ping
