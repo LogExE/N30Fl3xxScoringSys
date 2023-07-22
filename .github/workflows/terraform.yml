@@ -20,6 +20,8 @@ jobs:
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_wrapper: false
 
     - name: Terraform Init
       run: terraform init --backend-config="access_key=${{secrets.S3_ACCESS}}" --backend-config="secret_key=${{secrets.S3_SECRET}}"
