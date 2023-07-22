@@ -27,12 +27,12 @@ jobs:
       working-directory: ./terraform
 
     - name: Terraform Plan
-      run: terraform plan -input=false -var="service_token=${{secrets.YANDEX_TOKEN}}"
+      run: terraform plan -input=false -var="service_token=${{secrets.YANDEX_KEY}}"
       working-directory: ./terraform
 
     - name: Terraform Apply
       id: tfapply
-      run: terraform apply -auto-approve -input=false -var="service_token=${{secrets.YANDEX_TOKEN}}"
+      run: terraform apply -auto-approve -input=false -var="service_token=${{secrets.YANDEX_KEY}}"
       working-directory: ./terraform
     - name: Save host
       run: echo "ANSIBLE_HOST=${{steps.tfapply.outputs.external_ip}}" >> $GITHUB_ENV
