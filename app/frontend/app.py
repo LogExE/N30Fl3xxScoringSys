@@ -5,6 +5,7 @@ import os
 
 import aiohttp
 import flet as ft
+from datetime import datetime
 
 from data import *
 from style.custom_containers import custom_container
@@ -87,6 +88,13 @@ class MainFormUI(ft.UserControl):
         }
         super().__init__()
 
+    def check_date(self, date):
+        """ Преобразование даты в количество дней до текущего момента """
+        try:
+            return (datetime.now() - datetime.strptime(date, "%d.%m.%Y")).days
+        except:
+            return 0
+
     def mapping(self, val, dct):
         """ Преобразование значений выпадающий полей в формат, с которым работает ML-модель """
         return dct[val] if val else None
@@ -108,8 +116,7 @@ class MainFormUI(ft.UserControl):
             'NAME': self.name.value,
             'PATRONYMIC': self.patronymic.value,
             'CODE_GENDER': self.gender.content.value,
-            # TODO: вычисления на бэке: DAYS_BIRTH = (datetime.now() - datetime.strptime(DAYS_BIRTH, "%d.%m.%Y")).days
-            'DAYS_BIRTH': self.birth_date.value,
+            'DAYS_BIRTH': self.check_date(self.birth_date.value),
             'PASSPORT': self.passport_series.value + self.passport_number.value,
 
             'NAME_FAMILY_STATUS': self.mapping(self.family.value, NAME_FAMILY_STATUS_dict),
@@ -122,7 +129,7 @@ class MainFormUI(ft.UserControl):
             'ORGANIZATION_TYPE': self.mapping(self.organization.value, ORGANIZATION_TYPE_dict),
             'DAYS_EMPLOYED': self.days_employed.value,
             'NAME_INCOME_TYPE': self.mapping(self.income_type.value, NAME_INCOME_TYPE_dict),
-            # TODO: вычисления на бэке: AMT_INCOME_TOTAL = AMT_INCOME_TOTAL / 2
+            # TODO: вычисления на бэке: AMT_INCOME_TOTAL = AMT_INCOME_TOTAL / 2? уточнить у Алены
             'AMT_INCOME_TOTAL': self.income_total.value,
 
             'AMT_CREDIT': self.credit.value,
