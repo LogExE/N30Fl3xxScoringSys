@@ -78,8 +78,7 @@
       expect:
         command: docker image prune
         responses:
-          Question:
-            - 'y'
+          'WARNING! This will remove all dangling images.*': 'y'
         echo: true
         timeout: 120
     - name: Pull images
