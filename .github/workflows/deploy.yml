@@ -1,9 +1,8 @@
 name: deploy 
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
 
 jobs:
-  pylint:
-    uses: ./.github/workflows/pylint.yml
   docker:
   #  needs: [pylint]
     uses: ./.github/workflows/docker.yml
