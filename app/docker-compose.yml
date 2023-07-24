@@ -40,7 +40,7 @@ services:
     restart: always
   ml:
     image: logxx/scoringsys-ml
-    build: ./ML
+    build: ./ml
     container_name: scoringsys-ml
     environment:
     - UVICORN_HOST=0.0.0.0

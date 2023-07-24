@@ -20,7 +20,7 @@ jobs:
         pip install pylint
     - name: Install requirements
       run: |
-        pip install -r ./app/backend/requirements.txt
+        pip install -r ./app/ml/requirements.txt
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files './app/backend/*.py')
+        pylint $(git ls-files './app/ml/*.py')

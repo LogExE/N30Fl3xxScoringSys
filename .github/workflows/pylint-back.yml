@@ -3,7 +3,7 @@ name: Pylint backend
 on: 
   push:
     paths:
-      - app/ML/**
+      - app/backend/**
 
 jobs:
   test_back:
@@ -20,7 +20,7 @@ jobs:
         pip install pylint
     - name: Install requirements
       run: |
-        pip install -r ./app/ML/requirements.txt
+        pip install -r ./app/backend/requirements.txt
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files './app/ML/*.py')
+        pylint $(git ls-files './app/backend/*.py')
