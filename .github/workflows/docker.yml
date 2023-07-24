@@ -1,6 +1,8 @@
 name: docker build and push
-on: [workflow_call]
-
+on: 
+  push:
+    paths:
+      - app/**
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -23,7 +25,7 @@ jobs:
         with:
           context: ./app/nginx/
           push: true
-          tags: logxx/scoringsys-nginx:latest
+          tags: ${{ secrets.DOCKER_LOGIN }}/scoringsys-nginx:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
       -
@@ -32,7 +34,7 @@ jobs:
         with:
           context: ./app/frontend/
           push: true
-          tags: logxx/scoringsys-front:latest
+          tags: ${{ secrets.DOCKER_LOGIN }}/scoringsys-front:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
       -
@@ -41,7 +43,7 @@ jobs:
         with:
           context: ./app/backend/
           push: true
-          tags: logxx/scoringsys-back:latest
+          tags: ${{ secrets.DOCKER_LOGIN }}/scoringsys-back:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
       -
@@ -50,6 +52,6 @@ jobs:
         with:
           context: ./app/ML/
           push: true
-          tags: logxx/scoringsys-ml:latest
+          tags: ${{ secrets.DOCKER_LOGIN }}/scoringsys-ml:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
