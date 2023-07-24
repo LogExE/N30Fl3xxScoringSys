@@ -80,6 +80,7 @@
         responses:
           Question:
             - 'y'
+        echo: true
         timeout: 120
     - name: Pull images
       command:
