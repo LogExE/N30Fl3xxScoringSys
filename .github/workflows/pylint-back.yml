@@ -1,0 +1,26 @@
+name: Pylint backend
+
+on: 
+  push:
+    paths:
+      - app/ML/**
+
+jobs:
+  test_back:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Install pylint
+      run: |
+        python -m pip install --upgrade pip
+        pip install pylint
+    - name: Install requirements
+      run: |
+        pip install -r ./app/ML/requirements.txt
+    - name: Analysing the code with pylint
+      run: |
+        pylint $(git ls-files './app/ML/*.py')
