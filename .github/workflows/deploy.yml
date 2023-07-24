@@ -1,16 +1,5 @@
-name: ci 
-on:
-  push:
-    branches: ["development"]
-    paths:
-      - app/**
-      - terraform/**
-      - ansible/**
-      - .github/workflows/ci.yml
-      - .github/workflows/pylint.yml
-      - .github/workflows/docker.yml
-      - .github/workflows/ansible.yml
-      - .github/workflows/terraform.yml
+name: deploy 
+on: workflow_dispatch
 
 jobs:
   pylint:
