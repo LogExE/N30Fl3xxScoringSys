@@ -178,9 +178,10 @@ async def post_on_ml(info: Validation):
     print('VADKIM\t')
     print(info.json())
 
+    modeldata = {k: v for k, v in dict(info).items() if k not in {'SURNAME', 'NAME', 'PATRONYMIC', 'PASSPORT'}}
     # Шаг 2: Асинхронная отправка POST-запроса к другому приложению ML
     async with aiohttp.ClientSession() as session:
-        async with session.post(data_addr) as response:
+        async with session.post(data_addr, json=modeldata) as response:
             result = await response.text()
             print('POST to DATA:', result)
             return 'SUCCESS'
