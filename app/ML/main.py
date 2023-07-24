@@ -8,7 +8,8 @@ app = FastAPI()
 
 @app.post("/")
 async def root():
-    return {"message": "Hello, World!"}
+    print('1')
+    return {"Данные пришли"}
 
 if __name__ == "__main__":
     uvicorn.run(app, port=PORT)

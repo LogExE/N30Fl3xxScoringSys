@@ -175,6 +175,9 @@ async def post_on_ml(info: Validation):
     # Шаг 1: Прием валидированных данных info: Validation
     print(info)
 
+    print('VADKIM\t')
+    print(info.json())
+
     # Шаг 2: Асинхронная отправка POST-запроса к другому приложению ML
     async with aiohttp.ClientSession() as session:
         async with session.post(data_addr) as response:
