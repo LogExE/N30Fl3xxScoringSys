@@ -21,8 +21,9 @@ resource "yandex_compute_instance" "neopr" {
   }
 
   network_interface {
-    subnet_id = yandex_vpc_subnet.subnet-1.id
-    nat       = true
+    subnet_id      = yandex_vpc_subnet.subnet-1.id
+    nat            = true
+    nat_ip_address = yandex_vpc_address.addr.external_ipv4_address.0.address
   }
 
   scheduling_policy {
@@ -43,6 +44,13 @@ resource "yandex_vpc_subnet" "subnet-1" {
   zone           = var.yandex_zone
   network_id     = yandex_vpc_network.network-1.id
   v4_cidr_blocks = ["192.168.10.0/24"]
+}
+
+resource "yandex_vpc_address" "addr" {
+  name = "static_ip"
+  external_ipv4_address {
+    zone_id = var.yandex_zone
+  }
 }
 
 output "external_ip" {
