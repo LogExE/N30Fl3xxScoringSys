@@ -35,9 +35,11 @@
         state: latest
         update_cache: true
       become: true
-    - name: Install pip docker sdk
+    - name: Install pip docker sdk and pexpect
       ansible.builtin.pip:
-        name: docker
+        name: 
+          - docker
+          - pexpect
     - name: Verify docker stuff
       service:
         name: docker
@@ -72,6 +74,13 @@
       copy:
         src: ../app/docker-compose.yml
         dest: .
+    - name: Prune images
+      expect:
+        command: docker image prune
+        responses:
+          Question:
+            - 'y'
+        timeout: 120
     - name: Pull images
       command:
         cmd: docker compose pull
