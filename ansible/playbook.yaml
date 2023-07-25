@@ -87,3 +87,5 @@
     - name: Launch docker compose
       command:
         cmd: docker compose --profile deploy up --detach --no-build
+      environment: 
+        DUCKDNS_TOKEN: "{{ DUCKDNS_TOKEN }}"
