@@ -68,7 +68,7 @@
       register: stat_res
     - name: Down docker compose if .yml exists
       command:
-        cmd: docker compose down
+        cmd: docker compose --profile deploy down
       when: stat_res.stat.exists
     - name: copy docker-compose.yml
       copy:
@@ -83,7 +83,7 @@
         timeout: 120
     - name: Pull images
       command:
-        cmd: docker compose pull
+        cmd: docker compose --profile deploy pull
     - name: Launch docker compose
       command:
-        cmd: docker compose up --detach --no-build
+        cmd: docker compose --profile deploy up --detach --no-build

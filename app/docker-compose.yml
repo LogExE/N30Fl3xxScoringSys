@@ -1,15 +1,33 @@
 version: "3"
 
 services:
+  nginx-dev:
+    image: nginx
+    container_name: scoringsys-nginx
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 80:80
+    depends_on:
+      - frontend
+    restart: always
+    profiles:
+     - dev
   nginx:
-      image: logxx/scoringsys-nginx
-      build: ./nginx
-      container_name: scoringsys-nginx
-      ports:
-        - 80:80
-      depends_on:
-        - frontend
-      restart: always
+    image: logxx/scoringsys-nginx
+    build: ./nginx
+    container_name: scoringsys-nginx
+    volumes:
+      - certbotwww:/var/www/certbot/:ro
+      - certbotconf:/etc/nginx/ssl/:ro
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - frontend
+    restart: always
+    profiles:
+      - deploy
   frontend:
     image: logxx/scoringsys-front
     build: ./frontend
@@ -48,3 +66,23 @@ services:
     expose:
       - 8888
     restart: always
+  duckdns:
+    image: lscr.io/linuxserver/duckdns
+    container_name: scoringsys-duckdns
+    environment:
+      - SUBDOMAINS=scoringsys
+      - TOKEN=${DUCKDNS_TOKEN}
+    restart: always
+    profiles:
+      - deploy
+  certbot:
+    image: certbot/certbot
+    container_name: scoringsys-certbot
+    volumes:
+      - certbotwww:/var/www/certbot:rw
+      - certbotconf:/etc/letsencrypt/:rw
+    profiles:
+      - deploy
+volumes:
+  certbotwww:
+  certbotconf:
