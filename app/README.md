@@ -3,13 +3,15 @@
 ### (Важно) Применение изменений
 Если до этого окружение уже разворачивалось, нужно заранее выполнить эту строчку:
 ```sh
-docker compose build
+docker compose --profile dev build
 ```
 
 ### Запуск
 Наберите в командной строке:
 ```sh
-docker compose up -d
+docker compose --profile dev up -d 
+# можно добавить флаг --build после -d
+# чтобы не запускать compose build отдельно
 ```
 
 ## Просмотр логов
@@ -20,11 +22,11 @@ docker logs scoringsys-front # или scoringsys-back соответственн
 
 или же, для просмотра одновременно всех логов:
 ```sh
-docker compose logs
+docker compose --profile dev logs
 ```
 
 ## Завершение работы
 Для сворачивания нужно написать вот это:
 ```sh
-docker compose down
+docker compose --profile dev down
 ```
