@@ -81,7 +81,11 @@
           'WARNING! This will remove all dangling images.*': 'y'
         echo: true
         timeout: 120
-    - name: Create dummy self-signed certificate
+    - name: Create directory
+      file:
+        path: ./live/scoringsys.duckdns.com
+        state: directory
+    - name: Create dummy self-signed certificates
       community.crypto.x509_certificate:
         path: ./live/scoringsys.duckdns.com/fullchain.pem
         privatekey_path: ./live/scoringsys.duckdns.com/privkey.pem
