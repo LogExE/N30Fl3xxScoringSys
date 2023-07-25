@@ -104,4 +104,4 @@
         CERT_EMAIL: "{{ CERT_EMAIL }}"
     - name: Copy dummy certs to volume
       command:
-        cmd: docker cp ./live scoringsys-nginx:/etc/nginx/ssl/
+        cmd: docker cp ./live scoringsys-certbot:/etc/letsencrypt/
