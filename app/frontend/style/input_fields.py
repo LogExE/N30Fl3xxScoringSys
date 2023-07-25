@@ -26,17 +26,44 @@ class InputFields(ft.TextField):
         self.focused_border_color = ft.colors.DEEP_PURPLE_500
         self.focused_border_width = 2
 
-    def set_error(self, is_error):
+        self.tooltip = None
+
+    def set_error(self, error_msg):
         """ Установка поля в состояние 'заполнено корректно'/'заполнено с ошибками' """
-        if is_error:
+        if error_msg:
             # заполнено с ошибками
             self.border_color = ft.colors.RED_500
             self.focused_border_color = ft.colors.RED_500
             self.border_width = 2
+
+            if "integer" in error_msg:
+                if self.hint_text == "ДД.ММ.ГГГГ":
+                    self.tooltip = "Введите корректную дату в формате ДД.ММ.ГГГГ"
+                else:
+                    self.tooltip = "Введите целочисленное значение"
+            elif "number" in error_msg:
+                self.tooltip = "Введите числовое значение"
+            elif "10" in error_msg:
+                if self.label == "Серия":
+                    self.tooltip = "Поле должно содержать ровно 4 цифры"
+                elif self.label == "Номер":
+                    self.tooltip = "Поле должно содержать ровно 6 цифр"
+            elif "3" in error_msg:
+                self.tooltip = "Поле должно содержать хотя бы 3 символа"
+            elif "1" in error_msg:
+                self.tooltip = "Поле должно содержать хотя бы 1 символ"
+            elif "less" in error_msg:
+                self.tooltip = "Превышение допустимого возраста"
+            elif "greater" in error_msg:
+                self.tooltip = "Недостижение допустимого возраста"
+            else:
+                self.tooltip = error_msg
+
         else:
             # заполнено корректно
             self.border_color = ft.colors.BLACK
             self.focused_border_color = ft.colors.DEEP_PURPLE_500
             self.border_width = 1
+            self.tooltip = None
 
         self.update()

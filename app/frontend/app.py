@@ -37,7 +37,7 @@ class MainFormUI(ft.UserControl):
         self.passport_number = InputFields("Номер", 2, 6)
 
         self.family = InputDropdown(NAME_FAMILY_STATUS_rus, 2)
-        self.children = InputFields("Количество детей", 1)
+        self.children = InputFields("Количество детей", 1, 2)
         self.house = InputDropdown(NAME_HOUSING_TYPE_rus, 2)
         self.car = ft.Checkbox(label="Есть машина", offset=(0, -0.1))
         self.education = InputDropdown(NAME_EDUCATION_TYPE_rus, 3)
@@ -51,10 +51,11 @@ class MainFormUI(ft.UserControl):
         self.credit = InputFields("Сумма кредита", 1.92, suffix_text="\u20BD")
         self.months = InputFields("Кредитный период", 1.92, suffix_text="месяцев")
 
-        self.submit = ft.FilledButton(
+        self.submit = ft.FloatingActionButton(
             width=MAIN_WIDTH,
             height=45,
-            text="Узнать кредитный рейтинг",
+            content=ft.Text("Узнать кредитный рейтинг", color=ft.colors.WHITE),
+            bgcolor=MAIN_COLOR,
             on_click=lambda e: asyncio.run(self.submit_clicked(e))
         )
         self.progress = ft.ProgressRing(visible=False)
@@ -93,7 +94,7 @@ class MainFormUI(ft.UserControl):
         try:
             return (datetime.now() - datetime.strptime(date, "%d.%m.%Y")).days
         except:
-            return 0
+            return None
 
     def mapping(self, val, dct):
         """ Преобразование значений выпадающий полей в формат, с которым работает ML-модель """
@@ -146,14 +147,18 @@ class MainFormUI(ft.UserControl):
                 print("\nResp_body: ", resp)
 
                 # Подсвечивание полей, заполненных неправильно
-                err_fields = [] if resp == 'SUCCESS' else [err_dict['loc'][1] for err_dict in resp['detail']]
+                if resp == 'SUCCESS':
+                    err_fields = {}
+                    # TODO: извечение скорингового балла
+                else:
+                    err_fields = {err_dict['loc'][1]: err_dict['msg'] for err_dict in resp['detail']}
 
                 for field in self.fields.keys():
                     if field != 'PASSPORT':
-                        self.fields[field].set_error(field in err_fields)
+                        self.fields[field].set_error(err_fields[field] if field in err_fields.keys() else None)
                     else:
                         for f in self.fields[field]:
-                            f.set_error(field in err_fields)
+                            f.set_error(err_fields[field] if field in err_fields.keys() else None)
 
                 # Вывод результата
                 score = 100  # позже заменим на скоринговый балл
@@ -228,8 +233,7 @@ class MainFormUI(ft.UserControl):
                         ft.Divider(height=10, color="transparent"),
                         ft.Row([
                             ft.Text("Тип жилья:"),
-                            ft.VerticalDivider(width=68), self.house,
-                            ft.VerticalDivider(width=15), self.car
+                            ft.VerticalDivider(width=68), self.house, self.car
                         ]),
                         ft.Divider(height=20, color="transparent"),
                         ft.Row([

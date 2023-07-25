@@ -17,13 +17,17 @@ class InputRadio(ft.Container):
         self.border = None
         self.border_radius = 5
 
-    def set_error(self, is_error):
+        self.tooltip = None
+
+    def set_error(self, error_msg):
         """ Установка поля в состояние 'заполнено корректно'/'заполнено с ошибками' """
-        if is_error:
+        if error_msg:
             # заполнено с ошибками
             self.border = ft.border.all(width=2, color=ft.colors.RED_500)
+            self.tooltip = "Выберите значение"
         else:
             # заполнено корректно
             self.border = None
+            self.tooltip = None
 
         self.update()

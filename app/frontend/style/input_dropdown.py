@@ -21,21 +21,22 @@ class InputDropdown(ft.Dropdown):
         self.border_width = 1
         self.focused_border_color = ft.colors.DEEP_PURPLE_500
         self.focused_border_width = 2
-        self.hint_text = " "
 
-    def set_error(self, is_error):
+        self.tooltip = None
+
+    def set_error(self, error_msg):
         """ Установка поля в состояние 'заполнено корректно'/'заполнено с ошибками' """
-        if is_error:
+        if error_msg:
             # заполнено с ошибками
             self.border_color = ft.colors.RED_500
             self.focused_border_color = ft.colors.RED_500
             self.border_width = 2
-            self.hint_text = "Выберите значение"
+            self.tooltip = "Выберите значение"
         else:
             # заполнено корректно
             self.border_color = ft.colors.BLACK
             self.focused_border_color = ft.colors.DEEP_PURPLE_500
             self.border_width = 1
-            self.hint_text = " "
+            self.tooltip = None
 
         self.update()
