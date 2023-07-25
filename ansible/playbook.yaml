@@ -81,14 +81,11 @@
           'WARNING! This will remove all dangling images.*': 'y'
         echo: true
         timeout: 120
-    - name: Create volume for certbot
-      command:
-        cmd: docker volume create cbtconf
     - name: Create dummy self-signed certificate
       community.crypto.x509_certificate:
         path: ./live/scoringsys.duckdns.com/fullchain.pem
         privatekey_path: ./live/scoringsys.duckdns.com/privkey.pem
-      provider: selfsigned
+        provider: selfsigned
     - name: Pull images
       command:
         cmd: docker compose pull
