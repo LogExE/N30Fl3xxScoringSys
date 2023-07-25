@@ -63,7 +63,7 @@ services:
       - ./certbot/conf:/etc/letsencrypt/:rw
     depends_on:
       - nginx
-    command: certonly --webroot --webroot-path /var/www/certbot --email ${CERT_EMAIL} --agree-tos --no-eff-email -d scoringsys.duckdns.com
+    command: certonly --webroot --webroot-path /var/www/certbot/ --email ${CERT_EMAIL} --agree-tos --no-eff-email -d scoringsys.duckdns.org
 volumes:
   cbtwww:
   cbtconf:
