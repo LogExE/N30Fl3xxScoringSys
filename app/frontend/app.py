@@ -46,7 +46,7 @@ class MainFormUI(ft.UserControl):
         self.organization = InputDropdown(sorted(ORGANIZATION_TYPE_rus), 3)
         self.days_employed = InputFields("", 3, 3, suffix_text="лет")
         self.income_type = InputDropdown(NAME_INCOME_TYPE_rus, 1.5)
-        self.income_total = InputFields("Среднегодовой доход", 1.42, suffix_text="\u20BD")
+        self.income_total = InputFields("Годовой доход", 1.42, suffix_text="\u20BD")
 
         self.credit = InputFields("Сумма кредита", 1.92, suffix_text="\u20BD")
         self.months = InputFields("Кредитный период", 1.92, suffix_text="месяцев")
