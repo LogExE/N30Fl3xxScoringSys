@@ -21,8 +21,8 @@ resource "yandex_compute_instance" "neopr" {
   }
 
   network_interface {
-    subnet_id      = yandex_vpc_subnet.subnet-1.id
-    nat            = true
+    subnet_id = yandex_vpc_subnet.subnet-1.id
+    nat       = true
   }
 
   scheduling_policy {
