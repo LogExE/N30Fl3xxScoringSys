@@ -14,8 +14,8 @@ services:
       - frontend
     restart: always
   frontend:
-    image: logxx/scoringsys-front
-    container_name: scoringsys-front
+    image: logxx/scoringsys-frontend
+    container_name: scoringsys-frontend
     environment:
       - BACKEND_HOST=backend
       - FLET_PORT=50422
@@ -26,8 +26,8 @@ services:
       - backend
     restart: always
   backend:
-    image: logxx/scoringsys-back
-    container_name: scoringsys-back
+    image: logxx/scoringsys-backend
+    container_name: scoringsys-backend
     environment:
       - FRONTEND_HOST=frontend
       - FRONTEND_PORT=50422
