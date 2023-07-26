@@ -5,8 +5,8 @@ services:
     image: logxx/scoringsys-nginx
     container_name: scoringsys-nginx
     volumes:
-      - ./certbot/www:/var/www/certbot/:ro
-      - ./certbot/conf:/etc/nginx/ssl/:ro
+      - cbtwww:/var/www/certbot/:ro
+      - cbtconf:/etc/nginx/ssl/:ro
     ports:
       - 80:80
       - 443:443
@@ -48,22 +48,8 @@ services:
     expose:
       - 8888
     restart: always
-  duckdns:
-    image: lscr.io/linuxserver/duckdns
-    container_name: scoringsys-duckdns
-    environment:
-      - SUBDOMAINS=scoringsys
-      - TOKEN=${DUCKDNS_TOKEN}
-    restart: always
-  certbot:
-    image: certbot/certbot
-    container_name: scoringsys-certbot
-    volumes:
-      - ./certbot/www:/var/www/certbot/:rw
-      - ./certbot/conf:/etc/letsencrypt/:rw
-    depends_on:
-      - nginx
-    command: certonly --webroot --webroot-path /var/www/certbot/ --email ${CERT_EMAIL} --agree-tos --no-eff-email -d scoringsys.duckdns.org
 volumes:
   cbtwww:
+    external: true
   cbtconf:
+    external: true

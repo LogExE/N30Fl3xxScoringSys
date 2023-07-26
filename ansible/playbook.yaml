@@ -37,7 +37,7 @@
       become: true
     - name: Install pip docker sdk and pexpect
       ansible.builtin.pip:
-        name: 
+        name:
           - docker
           - pexpect
     - name: Verify docker stuff
@@ -51,9 +51,8 @@
         name: docker
         state: present
     - name: Get the username
-      command:
-        whoami
-      register: whoami_res 
+      command: whoami
+      register: whoami_res
     - name: Add user to docker group
       user:
         name: "{{ whoami_res.stdout }}"
@@ -78,30 +77,52 @@
       expect:
         command: docker image prune
         responses:
-          'WARNING! This will remove all dangling images.*': 'y'
+          "WARNING! This will remove all dangling images.*": "y"
         echo: true
         timeout: 120
-    - name: Create directory
-      file:
-        path: ./live/scoringsys.duckdns.com
-        state: directory
-    - name: Create dummy private key
-      community.crypto.openssl_privatekey:
-        path: ./live/scoringsys.duckdns.com/privkey.pem
-    - name: Create dummy self-signed certificates
-      community.crypto.x509_certificate:
-        path: ./live/scoringsys.duckdns.com/fullchain.pem
-        privatekey_path: ./live/scoringsys.duckdns.com/privkey.pem
-        provider: selfsigned
+    - name: check if duckdns container exists
+      command: docker container inspect scoringsys-duckdns
+      register: duck_ex
+      failed_when: false
+    - name: Launch duck dns if not already
+      command:
+        cmd: docker run --name scoringsys-duckdns lscr.io/linuxserver/duckdns -e SUBDOMAINS=scoringsys -e TOKEN={{ DUCKDNS_TOKEN }}
+      when: duck_ex|failed
+    - name: check if myvolume exists
+      command: docker volume inspect cbtwww cbtconf
+      register: vol_ex
+      failed_when: false
+    - name: Create volumes if they're absent
+      command:
+        cmd: docker volume create cbtwww cbtconf
+      when: vol_ex|failed
+    - name: Launch certbot
+      command:
+        cmd: >
+          docker run --rm
+          --mount source=cbtwww,target=/var/www/certbot/ 
+          --mount source=cbtconf,target=/etc/letsencrypt/ 
+          certbot/certbot certonly
+          --non-interactive
+          --standalone --preferred-challenges http 
+          --email {{ CERT_EMAIL }} --agree-tos 
+          -d scoringsys.duckdns.org
+      when: vol_ex|failed
+    - name: Create certbot timer
+      cron:
+        name: "update cert for https"
+        minute: "0"
+        hour: "0"
+        week: "0"
+        job: >
+          docker run --rm
+          --mount source=cbtwww,target=/var/www/certbot/ 
+          --mount source=cbtconf,target=/etc/letsencrypt/ 
+          certbot/certbot renew
+      when: vol_ex|failed
     - name: Pull images
       command:
         cmd: docker compose pull
     - name: Launch docker compose
       command:
         cmd: docker compose up --detach --no-build
-      environment: 
-        DUCKDNS_TOKEN: "{{ DUCKDNS_TOKEN }}"
-        CERT_EMAIL: "{{ CERT_EMAIL }}"
-    - name: Copy dummy certs to volume
-      command:
-        cmd: docker cp ./live scoringsys-certbot:/etc/letsencrypt/
