@@ -21,6 +21,8 @@ jobs:
           chmod 700 /home/runner/.ssh/id_ed25519
           echo -e "${{secrets.ANSIBLE_SSH_KEY}}" > /home/runner/.ssh/id_ed25519
           ssh-keyscan -t rsa,dsa,ecdsa,ed25519 "${{inputs.external_ip}}" >> /home/runner/.ssh/known_hosts
+      - name: Ansible Docker extension install
+        run: ansible-galaxy collection install community.docker
       - name: Run ansible
         run: ansible-playbook -u ${{secrets.ANSIBLE_DEPLOY_USER}} -i ${{inputs.external_ip}}, -e "DUCKDNS_TOKEN=${{secrets.DUCKDNS_TOKEN}} CERT_EMAIL=${{secrets.CERT_EMAIL}}" playbook.yaml
         working-directory: ./ansible

@@ -61,65 +61,68 @@
       become: true
     - name: reset connection
       meta: reset_connection
-    - name: Check docker compose file
-      stat:
-        path: docker-compose.yml
-      register: stat_res
-    - name: Down docker compose if .yml exists
-      command:
-        cmd: docker compose down
-      when: stat_res.stat.exists
-    - name: copy docker-compose.yml
-      copy:
-        src: ../app/docker-compose.deploy.yml
-        dest: docker-compose.yml
+    - name: Update docker-compose.yml
+      block:
+        - name: Check docker compose file
+          stat:
+            path: docker-compose.yml
+          register: stat_res
+        - name: Down docker compose if .yml exists
+          command:
+            cmd: docker compose down
+          when: stat_res.stat.exists
+        - name: copy docker-compose.yml
+          copy:
+            src: ../app/docker-compose.deploy.yml
+            dest: docker-compose.yml
     - name: Prune images
-      expect:
-        command: docker image prune
-        responses:
-          "WARNING! This will remove all dangling images.*": "y"
-        echo: true
-        timeout: 120
-    - name: check if duckdns container exists
-      command: docker container inspect scoringsys-duckdns
-      register: duck_ex
-      failed_when: false
-    - name: Launch duck dns if not already
-      command:
-        cmd: docker run --name scoringsys-duckdns lscr.io/linuxserver/duckdns -e SUBDOMAINS=scoringsys -e TOKEN={{ DUCKDNS_TOKEN }}
-      when: duck_ex|failed
-    - name: check if myvolume exists
-      command: docker volume inspect cbtwww cbtconf
-      register: vol_ex
-      failed_when: false
-    - name: Create volumes if they're absent
-      command:
-        cmd: docker volume create cbtwww cbtconf
-      when: vol_ex|failed
+      community.docker.docker_prune:
+        images: true
+    - name: Ensure duckdns container
+      community.docker.docker_container:
+        name: scoringsys-duckdns
+        image: lscr.io/linuxserver/duckdns
+        env:
+          SUBDOMAINS: scoringsys
+          TOKEN: "{{ DUCKDNS_TOKEN }}"
+        state: started
+    - name: Create volumes
+      block:
+        - name: Create certbot/wwww
+          community.docker.docker_volume:
+            name: cbtwww
+            state: present
+        - name: Create certbot/conf
+          community.docker.docker_volume:
+            name: cbtconf
+            state: present
     - name: Launch certbot
-      command:
-        cmd: >
-          docker run --rm
-          --mount source=cbtwww,target=/var/www/certbot/ 
-          --mount source=cbtconf,target=/etc/letsencrypt/ 
-          certbot/certbot certonly
+      community.docker.docker_container:
+        name: certbot
+        image: certbot/certbot
+        volumes:
+          - cbtwww:/var/www/certbot/
+          - cbtconf:/etc/letsencrypt/
+        ports:
+          - 80:80
+        command: >
+          certonly
           --non-interactive
           --standalone --preferred-challenges http 
           --email {{ CERT_EMAIL }} --agree-tos 
           -d scoringsys.duckdns.org
-      when: vol_ex|failed
+        auto_remove: true
     - name: Create certbot timer
       cron:
         name: "update cert for https"
         minute: "0"
         hour: "0"
-        week: "0"
+        weekday: "0"
         job: >
           docker run --rm
           --mount source=cbtwww,target=/var/www/certbot/ 
           --mount source=cbtconf,target=/etc/letsencrypt/ 
           certbot/certbot renew
-      when: vol_ex|failed
     - name: Pull images
       command:
         cmd: docker compose pull
