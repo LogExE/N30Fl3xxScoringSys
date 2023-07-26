@@ -147,9 +147,8 @@ class MainFormUI(ft.UserControl):
                 print("\nResp_body: ", resp)
 
                 # Подсвечивание полей, заполненных неправильно
-                if resp == 'SUCCESS':
+                if type(resp) is not dict:
                     err_fields = {}
-                    # TODO: извечение скорингового балла
                 else:
                     err_fields = {err_dict['loc'][1]: err_dict['msg'] for err_dict in resp['detail']}
 
@@ -161,12 +160,16 @@ class MainFormUI(ft.UserControl):
                             f.set_error(err_fields[field] if field in err_fields.keys() else None)
 
                 # Вывод результата
-                score = 100  # позже заменим на скоринговый балл
                 self.submit.visible = True
                 self.progress.visible = False
 
                 if not err_fields:
-                    self.score.value = f"Ваш крединый рейтинг: {score}"
+                    score = int(float(resp) * 100)
+                    self.score.value = f"Ваш крединый рейтинг: {score}%\n"
+                    if score < 40:
+                        self.score.value += "Высокий шанс выдачи кредита"
+                    else:
+                        self.score.value += "Низкий шанс выдачи кредита"
                 else:
                     self.score.value = f"Пожалуйста, заполните форму правильно :("
 

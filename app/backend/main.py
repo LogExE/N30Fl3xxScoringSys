@@ -184,7 +184,7 @@ async def post_on_ml(info: Validation):
         async with session.post(data_addr, json=modeldata) as response:
             result = await response.text()
             print('POST to DATA:', result)
-            return 'SUCCESS'
+            return result
 
 
 
