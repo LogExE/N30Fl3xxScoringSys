@@ -90,6 +90,7 @@
           SUBDOMAINS: scoringsys
           TOKEN: "{{ DUCKDNS_TOKEN }}"
         state: started
+        restart_policy: always
     - name: Create volumes
       block:
         - name: Create certbot/wwww
