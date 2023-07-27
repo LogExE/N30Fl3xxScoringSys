@@ -127,7 +127,7 @@
           docker run --rm
           --mount source=cbtwww,target=/var/www/certbot/ 
           --mount source=cbtconf,target=/etc/letsencrypt/ 
-          certbot/certbot renew
+          certbot/certbot renew && docker compose restart nginx
     - name: Pull images
       command:
         cmd: docker compose pull
