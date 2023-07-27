@@ -54,7 +54,7 @@ class MainFormUI(ft.UserControl):
         self.submit = ft.FloatingActionButton(
             width=MAIN_WIDTH,
             height=45,
-            content=ft.Text("Узнать кредитный рейтинг", color=ft.colors.WHITE),
+            content=ft.Text("Узнать скоринговый балл", color=ft.colors.WHITE),
             bgcolor=MAIN_COLOR,
             on_click=lambda e: asyncio.run(self.submit_clicked(e))
         )
@@ -165,11 +165,11 @@ class MainFormUI(ft.UserControl):
 
                 if not err_fields:
                     score = int(float(resp) * 100)
-                    self.score.value = f"Ваш крединый рейтинг: {score}%\n"
-                    if score < 40:
-                        self.score.value += "Высокий шанс выдачи кредита"
+                    self.score.value = f"Cкоринговый балл: {score}%\n"
+                    if score <= 40:
+                        self.score.value += "Низкий кредитный риск"
                     else:
-                        self.score.value += "Низкий шанс выдачи кредита"
+                        self.score.value += "Высокий кредитный риск"
                 else:
                     self.score.value = f"Пожалуйста, заполните форму правильно :("
 
@@ -196,7 +196,7 @@ class MainFormUI(ft.UserControl):
                         color=MAIN_COLOR
                     ),
                     ft.Text(
-                        "Заполните форму, чтобу узнать свой кредитный рейтинг.",
+                        "Заполните форму, чтобу узнать скоринговый балл.",
                         size=18,
                         opacity=0.4
                     ),
