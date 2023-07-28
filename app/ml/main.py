@@ -9,7 +9,7 @@ PORT = 8888
 
 app = FastAPI()
 
-model = joblib.load('./model/scoring_model.sav')
+model = joblib.load('./model/best_extra_scoring_model.sav')
 
 class ModelData(BaseModel):
     CODE_GENDER: str
