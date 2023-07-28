@@ -130,11 +130,9 @@ class MainFormUI(ft.UserControl):
             'ORGANIZATION_TYPE': self.mapping(self.organization.value, ORGANIZATION_TYPE_dict),
             'DAYS_EMPLOYED': self.days_employed.value,
             'NAME_INCOME_TYPE': self.mapping(self.income_type.value, NAME_INCOME_TYPE_dict),
-            # TODO: вычисления на бэке: AMT_INCOME_TOTAL = AMT_INCOME_TOTAL / 2? уточнить у Алены
             'AMT_INCOME_TOTAL': self.income_total.value,
 
             'AMT_CREDIT': self.credit.value,
-            # TODO: вычисления на бэке: AMT_ANNUITY = AMT_CREDIT / AMT_ANNUITY
             'AMT_ANNUITY': self.months.value
         }
 
