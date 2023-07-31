@@ -7,7 +7,7 @@ from helper import apply_mapping, reorder_df
 
 PORT = 8888
 
-app = FastAPI()
+app = FastAPI(docs_url='/modeldocs', openapi_url="/modeldocs/openapi.json")
 
 model = joblib.load('./model/best_extra_scoring_model.sav')
 
@@ -36,6 +36,7 @@ async def root(model_data: ModelData):
     df = reorder_df(df)
     df = df.fillna(0)
     y_predict = model.predict_proba(df)
+    print(y_predict)
     return y_predict[0, 1]
 
 if __name__ == "__main__":
