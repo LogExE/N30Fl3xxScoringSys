@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Wait for VM to spawn
-        uses: iFaxity/wait-on-action@v1.1
+        uses: iFaxity/wait-on-action@v1
         with:
           resource: "${{inputs.external_ip}}:22"
       - name: ssh setup
