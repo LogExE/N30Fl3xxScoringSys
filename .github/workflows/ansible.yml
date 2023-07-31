@@ -16,7 +16,7 @@ jobs:
       - name: Wait for VM to spawn
         uses: iFaxity/wait-on-action@v1
         with:
-          resource: "${{inputs.external_ip}}:22"
+          resource: "tcp://${{inputs.external_ip}}:22"
       - name: ssh setup
         run: |
           eval `ssh-agent -s`

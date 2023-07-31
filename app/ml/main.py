@@ -17,7 +17,7 @@ class ModelData(BaseModel):
     NAME_FAMILY_STATUS: str
     CNT_CHILDREN: int
     NAME_HOUSING_TYPE: str
-    FLAG_OWN_CAR: str
+    FLAG_OWN_CAR: int
     NAME_EDUCATION_TYPE: str
     OCCUPATION_TYPE: str
     ORGANIZATION_TYPE: str

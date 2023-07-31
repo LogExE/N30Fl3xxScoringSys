@@ -11,6 +11,10 @@ def apply_mapping(df):
 
     df['EXPERIENCE'] = df['DAYS_EMPLOYED'].astype('int64')
 
+    df['MONTHS_CREDIT'] = (df['AMT_ANNUITY']).astype('int64')
+
+    df['AMT_ANNUITY'] = df['AMT_CREDIT'] / df['AMT_ANNUITY']
+
     df['CREDIT_INCOME_PERCENT'] = (df['AMT_CREDIT']).astype('float') / (
     df['AMT_INCOME_TOTAL']).astype('float')
     df['ANNUITY_INCOME_PERCENT'] = (df['AMT_ANNUITY']).astype('float') / (
