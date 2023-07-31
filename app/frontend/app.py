@@ -54,7 +54,7 @@ class MainFormUI(ft.UserControl):
         self.submit = ft.FloatingActionButton(
             width=MAIN_WIDTH,
             height=45,
-            content=ft.Text("Узнать скоринговый балл", color=ft.colors.WHITE),
+            content=ft.Text("Узнать оценку", color=ft.colors.WHITE),
             bgcolor=MAIN_COLOR,
             on_click=lambda e: asyncio.run(self.submit_clicked(e))
         )
