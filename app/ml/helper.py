@@ -29,7 +29,7 @@ def apply_mapping(df):
     return df
 
 def reorder_df(df):
-    df = df[['CNT_CHILDREN', 'AMT_INCOME_TOTAL', 'AMT_CREDIT', 'AMT_ANNUITY', 'MONTHS_CREDIT', 'OWN_CAR', 'IS_MEN',
+    list = ['CNT_CHILDREN', 'AMT_INCOME_TOTAL', 'AMT_CREDIT', 'AMT_ANNUITY', 'MONTHS_CREDIT', 'OWN_CAR', 'IS_MEN',
          'IS_FEMALE', 'AGE', 'EXPERIENCE', 'CREDIT_INCOME_PERCENT', 'ANNUITY_INCOME_PERCENT', 'CREDIT_TERM',
          'EXPERIENCE_PERCENT', 'EDUCATION', 'NAME_INCOME_TYPE_Businessman', 'NAME_INCOME_TYPE_Commercialassociate',
          'NAME_INCOME_TYPE_Maternityleave', 'NAME_INCOME_TYPE_Pensioner', 'NAME_INCOME_TYPE_Stateservant',
@@ -55,5 +55,9 @@ def reorder_df(df):
          'ORGANIZATION_TYPE_Religion', 'ORGANIZATION_TYPE_Restaurant', 'ORGANIZATION_TYPE_School',
          'ORGANIZATION_TYPE_Security', 'ORGANIZATION_TYPE_SecurityMinistries', 'ORGANIZATION_TYPE_Selfemployed',
          'ORGANIZATION_TYPE_Services', 'ORGANIZATION_TYPE_Telecom', 'ORGANIZATION_TYPE_Trade',
-         'ORGANIZATION_TYPE_Transport', 'ORGANIZATION_TYPE_University']]
+         'ORGANIZATION_TYPE_Transport', 'ORGANIZATION_TYPE_University']
+    for x in df:
+        if x not in list:
+            print(x)
+    df = df[list]
     return df
