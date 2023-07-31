@@ -12,6 +12,7 @@ resource "yandex_compute_instance" "neopr" {
     cores         = 2
     memory        = 2
   }
+  allow_stopping_for_update = true
 
   boot_disk {
     initialize_params {
