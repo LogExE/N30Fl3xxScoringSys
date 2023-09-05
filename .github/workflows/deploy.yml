@@ -1,0 +1,14 @@
+name: deploy 
+on: 
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    uses: ./.github/workflows/terraform.yml
+    secrets: inherit
+  ansible:
+    needs: [terraform]
+    uses: ./.github/workflows/ansible.yml
+    with:
+      external_ip: ${{ needs.terraform.outputs.external_ip }}
+    secrets: inherit

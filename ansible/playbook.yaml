@@ -1,0 +1,136 @@
+- hosts: all
+  name: Deploy compose
+  gather_facts: false
+  pre_tasks:
+    - name: Wait 600 seconds for target connection to become reachable/usable
+      wait_for_connection:
+  tasks:
+    - name: Gather facts
+      setup:
+    - name: Install docker deps
+      apt:
+        pkg:
+          - ca-certificates
+          - curl
+          - gnupg
+        state: latest
+        update_cache: true
+      become: true
+    - name: Add docker gpg key
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+      become: true
+    - name: Add docker repo
+      apt_repository:
+        repo: deb https://download.docker.com/linux/debian bullseye stable
+      become: true
+    - name: Update apt + install docker
+      apt:
+        pkg:
+          - docker-ce
+          - docker-compose-plugin
+        state: latest
+        update_cache: true
+      become: true
+    - name: Install pip3
+      apt:
+        name: python3-pip
+        state: latest
+        update_cache: true
+      become: true
+    - name: Install pip docker sdk and pexpect
+      ansible.builtin.pip:
+        name:
+          - docker
+          - pexpect
+    - name: Verify docker stuff
+      service:
+        name: docker
+        state: started
+        enabled: yes
+      become: true
+    - name: Ensure group "docker" exists
+      ansible.builtin.group:
+        name: docker
+        state: present
+    - name: Get the username
+      command: whoami
+      register: whoami_res
+    - name: Add user to docker group
+      user:
+        name: "{{ whoami_res.stdout }}"
+        append: yes
+        groups: docker
+      become: true
+    - name: reset connection
+      meta: reset_connection
+    - name: Update docker-compose.yml
+      block:
+        - name: Check docker compose file
+          stat:
+            path: docker-compose.yml
+          register: stat_res
+        - name: Down docker compose if .yml exists
+          command:
+            cmd: docker compose down
+          when: stat_res.stat.exists
+        - name: copy docker-compose.yml
+          copy:
+            src: ../app/docker-compose.deploy.yml
+            dest: docker-compose.yml
+    - name: Prune images
+      community.docker.docker_prune:
+        images: true
+    - name: Ensure duckdns container
+      community.docker.docker_container:
+        name: scoringsys-duckdns
+        image: lscr.io/linuxserver/duckdns
+        env:
+          SUBDOMAINS: scoringsys
+          TOKEN: "{{ DUCKDNS_TOKEN }}"
+        state: started
+        restart_policy: always
+    - name: Create volumes
+      block:
+        - name: Create certbot/wwww
+          community.docker.docker_volume:
+            name: cbtwww
+            state: present
+        - name: Create certbot/conf
+          community.docker.docker_volume:
+            name: cbtconf
+            state: present
+    - name: Launch certbot
+      community.docker.docker_container:
+        name: certbot
+        image: certbot/certbot
+        volumes:
+          - cbtwww:/var/www/certbot/
+          - cbtconf:/etc/letsencrypt/
+        ports:
+          - 80:80
+        command: >
+          certonly
+          --non-interactive
+          --standalone --preferred-challenges http 
+          --email {{ CERT_EMAIL }} --agree-tos 
+          -d scoringsys.duckdns.org
+        auto_remove: true
+    - name: Create certbot timer
+      cron:
+        name: "update cert for https"
+        minute: "0"
+        hour: "0"
+        weekday: "0"
+        job: >
+          docker run --rm
+          --mount source=cbtwww,target=/var/www/certbot/ 
+          --mount source=cbtconf,target=/etc/letsencrypt/ 
+          certbot/certbot renew && docker compose restart nginx
+    - name: Pull images
+      command:
+        cmd: docker compose pull
+    - name: Launch docker compose
+      command:
+        cmd: docker compose up --detach --no-build

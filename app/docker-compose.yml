@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+  nginx:
+    image: nginx
+    container_name: scoringsys-nginx
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 80:80
+    depends_on:
+      - frontend
+    restart: always
+  frontend:
+    build: ./frontend
+    container_name: scoringsys-front
+    environment:
+      - BACKEND_HOST=backend
+      - FLET_PORT=50422
+      - PYTHONUNBUFFERED=1
+    expose:
+      - 50422
+    depends_on:
+      - backend
+  backend:
+    build: ./backend
+    container_name: scoringsys-back
+    environment:
+      - FRONTEND_HOST=frontend
+      - FRONTEND_PORT=50422
+      - DATA_HOST=ml
+      - DATA_PORT=8888
+      - UVICORN_HOST=0.0.0.0
+      - UVICORN_PORT=8000
+      - UVICORN_ROOT_PATH=/api
+    expose:
+      - 8000
+  ml:
+    build: ./ml
+    container_name: scoringsys-ml
+    environment:
+    - UVICORN_HOST=0.0.0.0
+    - UVICORN_PORT=8888
+    expose:
+      - 8888

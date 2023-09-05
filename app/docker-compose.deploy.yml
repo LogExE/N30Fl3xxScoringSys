@@ -1,0 +1,55 @@
+version: "3"
+
+services:
+  nginx:
+    image: logxx/scoringsys-nginx
+    container_name: scoringsys-nginx
+    volumes:
+      - cbtwww:/var/www/certbot/:ro
+      - cbtconf:/etc/nginx/ssl/:ro
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - frontend
+    restart: always
+  frontend:
+    image: logxx/scoringsys-frontend
+    container_name: scoringsys-frontend
+    environment:
+      - BACKEND_HOST=backend
+      - FLET_PORT=50422
+      - PYTHONUNBUFFERED=1
+    expose:
+      - 50422
+    depends_on:
+      - backend
+    restart: always
+  backend:
+    image: logxx/scoringsys-backend
+    container_name: scoringsys-backend
+    environment:
+      - FRONTEND_HOST=frontend
+      - FRONTEND_PORT=50422
+      - DATA_HOST=ml
+      - DATA_PORT=8888
+      - UVICORN_HOST=0.0.0.0
+      - UVICORN_PORT=8000
+      - UVICORN_ROOT_PATH=/api
+    expose:
+      - 8000
+    restart: always
+  ml:
+    image: logxx/scoringsys-ml
+    container_name: scoringsys-ml
+    environment:
+    - UVICORN_HOST=0.0.0.0
+    - UVICORN_PORT=8888
+    expose:
+      - 8888
+    restart: always
+volumes:
+  cbtwww:
+    external: true
+  cbtconf:
+    external: true
